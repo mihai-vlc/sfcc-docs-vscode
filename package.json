@@ -1,7 +1,7 @@
 {
     "name": "sfcc-vscode-docs",
-    "displayName": "sfcc-vscode-docs",
-    "description": "View SFCC docs from vscode",
+    "displayName": "SFCC VSCode Docs",
+    "description": "Browse the SFCC documentation from VSCode.",
     "version": "0.0.1",
     "engines": {
         "vscode": "^1.70.0"
@@ -13,7 +13,16 @@
         "onCommand:sfcc-vscode-docs.openDocs",
         "onView:sfcc-vscode-docs.searchView"
     ],
+    "icon": "resources/icon.jpg",
     "main": "./out/extension.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ionutvmi/sfcc-vscode-docs"
+    },
+    "bugs": {
+        "url": "https://github.com/ionutvmi/sfcc-vscode-docs/issues",
+        "email": "ionutvmi@gmail.com"
+    },
     "contributes": {
         "commands": [
             {
