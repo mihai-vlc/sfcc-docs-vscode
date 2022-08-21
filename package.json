@@ -1,8 +1,8 @@
 {
-    "name": "sfcc-vscode-docs",
-    "displayName": "SFCC VSCode Docs",
+    "name": "sfcc-docs-vscode",
+    "displayName": "SFCC Docs in VSCode",
     "description": "Browse the SFCC documentation from VSCode.",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "engines": {
         "vscode": "^1.70.0"
     },
@@ -10,31 +10,31 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:sfcc-vscode-docs.openDocs",
-        "onView:sfcc-vscode-docs.searchView"
+        "onCommand:sfcc-docs-vscode.openDocs",
+        "onView:sfcc-docs-vscode.searchView"
     ],
     "icon": "resources/icon.jpg",
     "main": "./out/extension.js",
     "repository": {
         "type": "git",
-        "url": "https://github.com/ionutvmi/sfcc-vscode-docs"
+        "url": "https://github.com/ionutvmi/sfcc-docs-vscode"
     },
     "bugs": {
-        "url": "https://github.com/ionutvmi/sfcc-vscode-docs/issues",
+        "url": "https://github.com/ionutvmi/sfcc-docs-vscode/issues",
         "email": "ionutvmi@gmail.com"
     },
     "contributes": {
         "commands": [
             {
-                "command": "sfcc-vscode-docs.openDocs",
+                "command": "sfcc-docs-vscode.openDocs",
                 "title": "Open SFCC docs in side panel"
             }
         ],
         "views": {
-            "sfcc-vscode-docs": [
+            "sfcc-docs-vscode": [
                 {
                     "type": "webview",
-                    "id": "sfcc-vscode-docs.searchView",
+                    "id": "sfcc-docs-vscode.searchView",
                     "name": "SFCC Docs"
                 }
             ]
@@ -42,7 +42,7 @@
         "viewsContainers": {
             "activitybar": [
                 {
-                    "id": "sfcc-vscode-docs",
+                    "id": "sfcc-docs-vscode",
                     "title": "SFCC Docs",
                     "icon": "./resources/icon.png"
                 }

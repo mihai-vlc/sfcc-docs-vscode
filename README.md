@@ -1,32 +1,28 @@
-# sfcc-vscode-docs README
+# SFCC Documentation in VSCode
 
 Browse the SFCC documentation directly from VSCode.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+-   Search panel in the activity bar
+-   Details penel available as a sideview
 
-For example if there is an image subfolder under your extension project workspace:
+## Installation
 
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
--   `myExtension.enable`: Enable/disable this extension.
--   `myExtension.thing`: Set to `blah` to do something.
+You can install it from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ionutvmi.sfcc-docs-vscode).
+`ext install sfcc-docs-vscode`
 
 ## Release Notes
 
-### 1.0.0
-
-21/Aug/2022
-
--   Initial release
+The release notes are available in the [CHANGELOG.md](./CHANGELOG.md) document.
 
 ---
+
+## Author
+
+Mihai Ionut Vilcu
+
+-   [github/ionutvmi](https://github.com/ionutvmi)
+-   [twitter/mihai_vlc](http://twitter.com/mihai_vlc)
 
 **Enjoy!**

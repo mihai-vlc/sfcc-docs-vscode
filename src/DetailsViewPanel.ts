@@ -12,7 +12,7 @@ export default class DetailsViewPanel {
      */
     public static currentPanel: DetailsViewPanel | undefined;
 
-    public static readonly viewType = "sfcc-vscode-docs.detailsView";
+    public static readonly viewType = "sfcc-docs-vscode.detailsView";
 
     private readonly _panel: vscode.WebviewPanel;
     private readonly _extensionUri: vscode.Uri;
@@ -91,7 +91,7 @@ export default class DetailsViewPanel {
     public async updateForTopic(topic: string, baseUrl?: string) {
         baseUrl = baseUrl || "https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic";
         const contentUrl = normalizeUrl(`${baseUrl}/${topic}`);
-        console.log("normalized", contentUrl);
+
         this.currentBaseUrl = contentUrl.substring(0, contentUrl.lastIndexOf("/"));
         const response = await fetch(contentUrl);
         const result = await response.text();

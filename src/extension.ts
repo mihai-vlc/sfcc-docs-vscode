@@ -4,7 +4,7 @@ import SearchViewProvider from "./SearchViewProvider";
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
-        vscode.commands.registerCommand("sfcc-vscode-docs.openDocs", () => {
+        vscode.commands.registerCommand("sfcc-docs-vscode.openDocs", () => {
             DetailsViewPanel.createOrShow(context.extensionUri);
         })
     );
@@ -12,10 +12,7 @@ export function activate(context: vscode.ExtensionContext) {
     const searchProvider = new SearchViewProvider(context.extensionUri);
 
     context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider(
-            SearchViewProvider.viewType,
-            searchProvider
-        )
+        vscode.window.registerWebviewViewProvider(SearchViewProvider.viewType, searchProvider)
     );
 }
 

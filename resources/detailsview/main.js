@@ -14,17 +14,34 @@
     });
 
     document.addEventListener("click", function (event) {
-        const element = /** @type HTMLElement */ (event.target);
+        let element = /** @type HTMLElement */ (event.target);
 
         if (element.tagName !== "A") {
-            return;
+            const closestLink = element.closest("a");
+
+            if (!closestLink) {
+                return;
+            }
+
+            element = closestLink;
         }
+
         const href = element.getAttribute("href");
+
         if (!href) {
             return;
         }
 
         if (href.startsWith("https:")) {
+            return;
+        }
+
+        if (href.startsWith("#")) {
+            const section = document.querySelector(`a[name=${href.substring(1)}]`);
+
+            if (section) {
+                section.scrollIntoView();
+            }
             return;
         }
 
