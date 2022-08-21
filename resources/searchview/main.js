@@ -1,100 +1,108 @@
 //@ts-check
 
-// This script will be run within the webview itself
-// It cannot access the main VS Code APIs directly.
 (function () {
+    /**
+     * The application state.
+     * @typedef {Object} AppState
+     * @property {string} query - The search query
+     */
+
     const vscode = acquireVsCodeApi();
+    const resultWrapper = document.querySelector(".js-search-result-wrapper");
 
-    const oldState = /** @type {{colors: Array<{ value: string }>}} */ (
-        vscode.getState()
-    ) || {
-        colors: [],
-    };
+    /** @type HTMLDivElement|null */
+    const loader = document.querySelector(".js-loader");
 
-    let colors = oldState.colors;
+    /** @type HTMLInputElement|null */
+    const queryInput = document.querySelector(".js-query-input");
 
-    updateColorList(colors);
+    if (!resultWrapper || !queryInput) {
+        return;
+    }
 
-    document
-        .querySelector(".add-color-button")
-        .addEventListener("click", () => {
-            addColor();
+    queryInput.addEventListener("input", debounce(handleQueryChange));
+
+    function handleQueryChange(event) {
+        const query = event.target.value;
+
+        if (!query) {
+            return;
+        }
+
+        vscode.setState({
+            query: query,
         });
+
+        performSearch(query);
+    }
 
     // Handle messages sent from the extension to the webview
     window.addEventListener("message", (event) => {
         const message = event.data; // The json data that the extension sent
         switch (message.type) {
-            case "addColor": {
-                addColor();
-                break;
-            }
-            case "clearColors": {
-                colors = [];
-                updateColorList(colors);
+            case "searchResult": {
+                resultWrapper.innerHTML = message.data;
+
+                if (loader) {
+                    loader.style.display = "none";
+                }
                 break;
             }
         }
     });
 
-    /**
-     * @param {Array<{ value: string }>} colors
-     */
-    function updateColorList(colors) {
-        const ul = document.querySelector(".color-list");
-        ul.textContent = "";
-        for (const color of colors) {
-            const li = document.createElement("li");
-            li.className = "color-entry";
+    resultWrapper.addEventListener("click", function (event) {
+        const clickedLink = /** @type HTMLElement */ (event.target);
 
-            const colorPreview = document.createElement("div");
-            colorPreview.className = "color-preview";
-            colorPreview.style.backgroundColor = `#${color.value}`;
-            colorPreview.addEventListener("click", () => {
-                onColorClicked(color.value);
-            });
-            li.appendChild(colorPreview);
-
-            const input = document.createElement("input");
-            input.className = "color-input";
-            input.type = "text";
-            input.value = color.value;
-            input.addEventListener("change", (e) => {
-                const value = e.target.value;
-                if (!value) {
-                    // Treat empty value as delete
-                    colors.splice(colors.indexOf(color), 1);
-                } else {
-                    color.value = value;
-                }
-                updateColorList(colors);
-            });
-            li.appendChild(input);
-
-            ul.appendChild(li);
+        if (!clickedLink) {
+            return;
         }
 
-        // Update the saved state
-        vscode.setState({ colors: colors });
+        if (!clickedLink.classList.contains("link")) {
+            return;
+        }
+        let topic = clickedLink.getAttribute("href") || "";
+
+        topic = topic.replace("../topic/", "/");
+        topic = topic.replace(/\?resultof=.*/g, "");
+
+        openDetailsView(topic);
+    });
+
+    var appState = /** @type AppState */ (vscode.getState()) || { query: "" };
+
+    if (appState.query) {
+        queryInput.value = appState.query;
+        performSearch(appState.query);
+        queryInput.focus();
+        queryInput.select();
     }
 
-    /**
-     * @param {string} color
-     */
-    function onColorClicked(color) {
-        vscode.postMessage({ type: "colorSelected", value: color });
+    function performSearch(query) {
+        if (loader) {
+            loader.style.display = "block";
+        }
+
+        vscode.postMessage({
+            type: "newQuery",
+            query: query,
+        });
     }
 
-    /**
-     * @returns string
-     */
-    function getNewCalicoColor() {
-        const colors = ["020202", "f1eeee", "a85b20", "daab70", "efcb99"];
-        return colors[Math.floor(Math.random() * colors.length)];
+    function openDetailsView(topic) {
+        vscode.postMessage({
+            type: "openDetailsView",
+            topic: topic,
+        });
     }
 
-    function addColor() {
-        colors.push({ value: getNewCalicoColor() });
-        updateColorList(colors);
+    function debounce(func, timeout = 500) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                func.apply(this, args);
+            }, timeout);
+        };
     }
 })();

@@ -32,6 +32,7 @@ form > * {
 
 a {
     color: var(--vscode-textLink-foreground);
+    text-decoration: none;
 }
 
 a:hover,
@@ -115,6 +116,10 @@ body {
     outline: inset white;
 }
 
+.results .description {
+    margin-bottom: 10px;
+}
+
 .color-input {
     display: block;
     flex: 1;
@@ -129,4 +134,38 @@ body {
     display: block;
     border: none;
     margin: 0 auto;
+}
+
+.loader {
+    width: 100%;
+    margin: 0 auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 1px;
+    display: none;
+}
+
+.loader .loaderBar {
+    position: absolute;
+    border-radius: 10px;
+    top: 0;
+    right: 100%;
+    bottom: 0;
+    left: 0;
+    background: var(--vscode-focusBorder);
+    width: 0;
+    width: 5%;
+    animation: borealisBar 5s linear infinite;
+}
+
+@keyframes borealisBar {
+    0% {
+        left: 0%;
+        right: 100%;
+    }
+    100% {
+        left: 100%;
+        right: 0%;
+    }
 }

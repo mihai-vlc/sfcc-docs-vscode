@@ -1,5 +1,7 @@
 import fetch from "cross-fetch";
 import * as vscode from "vscode";
+import * as cheerio from "cheerio";
+import DetailsViewPanel from "./DetailsViewPanel";
 
 export default class SearchViewProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = "sfcc-vscode-docs.searchView";
@@ -26,56 +28,60 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.onDidReceiveMessage((data) => {
             switch (data.type) {
-                case "colorSelected": {
-                    vscode.window.activeTextEditor?.insertSnippet(
-                        new vscode.SnippetString(`#${data.value}`)
-                    );
+                case "newQuery": {
+                    this.getData(data.query);
+                    break;
+                }
+                case "openDetailsView": {
+                    DetailsViewPanel.createOrShow(this._extensionUri, data.topic);
                     break;
                 }
             }
         });
-        this.getData();
     }
 
-    public async getData() {
+    public async getData(query: string) {
+        const finalQuery = encodeURIComponent(query);
+        const baseUrl = "https://documentation.b2c.commercecloud.salesforce.com/DOC2/advanced";
         const response = await fetch(
-            "https://documentation.b2c.commercecloud.salesforce.com/DOC2/advanced/searchView.jsp?searchWord=product&maxHits=500"
+            `${baseUrl}/searchView.jsp?searchWord=${finalQuery}&maxHits=500`
         );
         const text = await response.text();
+        const $ = cheerio.load(text);
+        const $results = $("table.results");
+        const $allLinks = $results.find("a");
+
+        $allLinks.removeAttr("onmouseover");
+        $allLinks.removeAttr("onmouseout");
+
+        $results.find("td.icon").remove();
+
+        const resultHtml = $results.html();
+
+        if (resultHtml) {
+            this.sendResult(resultHtml);
+        }
 
         return text;
     }
 
-    public addColor() {
-        if (this._view) {
-            this._view.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
-            this._view.webview.postMessage({ type: "addColor" });
+    public sendResult(data: string) {
+        if (!this._view) {
+            return;
         }
-    }
-
-    public clearColors() {
-        if (this._view) {
-            this._view.webview.postMessage({ type: "clearColors" });
-        }
+        this._view.webview.postMessage({
+            type: "searchResult",
+            data: data,
+        });
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
         const mainJsUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(
-                this._extensionUri,
-                "resources",
-                "searchview",
-                "main.js"
-            )
+            vscode.Uri.joinPath(this._extensionUri, "resources", "searchview", "main.js")
         );
 
         const stylesUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(
-                this._extensionUri,
-                "resources",
-                "searchview",
-                "styles.css"
-            )
+            vscode.Uri.joinPath(this._extensionUri, "resources", "searchview", "styles.css")
         );
 
         // Use a nonce to only allow a specific script to be run.
@@ -89,16 +95,22 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                     Use a content security policy to only allow loading images from https or from our extension directory,
                     and only allow scripts that have a specific nonce.
                 -->
-                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';" />
+                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; img-src *; script-src 'nonce-${nonce}';" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <link href="${stylesUri}" rel="stylesheet" />
                 
-                <title>Cat Colors</title>
+                <title>SFCC Docs</title>
             </head>
             <body>
-                <ul class="color-list">
-                </ul>
-                <button class="add-color-button">Add Color</button>
+                <div class="loader js-loader">
+                    <div class="loaderBar"></div>
+                </div>
+                <input 
+                    class="js-query-input" 
+                    type="text" 
+                    placeholder="Search" />
+
+                <table class="js-search-result-wrapper results"></table>
 
                 <script nonce="${nonce}" src="${mainJsUri}"></script>
             </body>
@@ -108,8 +120,7 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
 
 function getNonce() {
     let text = "";
-    const possible =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     for (let i = 0; i < 32; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
