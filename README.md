@@ -2,7 +2,7 @@
 
 Browse the SFCC documentation directly from VSCode.
 
-![demo](/screenshoots/demo.gif)
+![demo](/screenshots/demo.gif)
 
 ## Features
 
