@@ -111,7 +111,7 @@ export default class DetailsViewPanel {
             $(el).attr("src", this.currentBaseUrl + "/" + src);
         });
 
-        $body.prepend(`<div class="page-url">${contentUrl}</div>`);
+        $body.prepend(`<div class="page-url js-page-url">${contentUrl}</div>`);
 
         const content = $body.html() || "No content was found";
 

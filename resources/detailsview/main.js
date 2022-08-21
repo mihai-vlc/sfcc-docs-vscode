@@ -2,6 +2,21 @@
 
 (function () {
     const vscode = acquireVsCodeApi();
+    const pageUrlElement = document.querySelector(".js-page-url");
+
+    if (
+        pageUrlElement &&
+        pageUrlElement.textContent &&
+        pageUrlElement.textContent.indexOf("#") > -1
+    ) {
+        const selector = pageUrlElement.textContent.split("#")[1];
+        scrollToElement("#" + selector);
+    } else {
+        setTimeout(() => {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }, 100);
+    }
 
     // Handle messages sent from the extension to the webview
     window.addEventListener("message", (event) => {
@@ -37,11 +52,7 @@
         }
 
         if (href.startsWith("#")) {
-            const section = document.querySelector(`a[name=${href.substring(1)}]`);
-
-            if (section) {
-                section.scrollIntoView();
-            }
+            scrollToElement(href);
             return;
         }
 
@@ -51,4 +62,12 @@
             topic: href,
         });
     });
+
+    function scrollToElement(selector) {
+        const section = document.querySelector(`a[name=${selector.substring(1)}]`);
+
+        if (section) {
+            section.scrollIntoView();
+        }
+    }
 })();
