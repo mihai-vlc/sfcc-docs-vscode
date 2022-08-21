@@ -70,4 +70,38 @@
             section.scrollIntoView();
         }
     }
+
+    let lastSelection = "";
+
+    // @ts-ignore
+    new VanillaContextMenu({
+        scope: document.querySelector("body"),
+        menuItems: [
+            {
+                label: "Copy",
+                callback: () => {
+                    if (lastSelection) {
+                        navigator.clipboard.writeText(lastSelection);
+                    }
+                },
+            },
+        ],
+    });
+
+    document.addEventListener("selectionchange", () => {
+        const text = getSelectionText();
+        if (text) {
+            lastSelection = text;
+        }
+    });
+
+    function getSelectionText() {
+        var text = "";
+        if (window.getSelection) {
+            text = window.getSelection().toString();
+        } else if (document.selection && document.selection.type != "Control") {
+            text = document.selection.createRange().text;
+        }
+        return text;
+    }
 })();

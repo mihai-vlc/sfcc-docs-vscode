@@ -126,6 +126,16 @@ export default class DetailsViewPanel {
             vscode.Uri.joinPath(this._extensionUri, "resources", "detailsview", "main.js")
         );
 
+        const contextMenuJsUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(
+                this._extensionUri,
+                "resources",
+                "detailsview",
+                "vendor",
+                "vanilla-context-menu.js"
+            )
+        );
+
         const stylesUri = webview.asWebviewUri(
             vscode.Uri.joinPath(this._extensionUri, "resources", "detailsview", "styles.css")
         );
@@ -141,13 +151,14 @@ export default class DetailsViewPanel {
                     Use a content security policy to only allow loading images from https or from our extension directory,
                     and only allow scripts that have a specific nonce.
                 -->
-                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; img-src *; script-src 'nonce-${nonce}';">
+                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; img-src *; script-src 'nonce-${nonce}';">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <link href="${stylesUri}" rel="stylesheet" />
                 <title>SFCC Details View</title>
             </head>
             <body>
                 ${pageContent}
+                <script nonce="${nonce}" src="${contextMenuJsUri}"></script>
                 <script nonce="${nonce}" src="${mainJsUri}"></script>
             </body>
             </html>`;
