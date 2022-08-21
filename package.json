@@ -27,7 +27,7 @@
         "commands": [
             {
                 "command": "sfcc-docs-vscode.openDocs",
-                "title": "Open SFCC docs in side panel"
+                "title": "Open SFCC Docs"
             }
         ],
         "views": {
@@ -45,6 +45,14 @@
                     "id": "sfcc-docs-vscode",
                     "title": "SFCC Docs",
                     "icon": "./resources/icon.png"
+                }
+            ]
+        },
+        "menus": {
+            "editor/context": [
+                {
+                    "command": "sfcc-docs-vscode.openDocs",
+                    "group": "sfcc-docs-vscode"
                 }
             ]
         }

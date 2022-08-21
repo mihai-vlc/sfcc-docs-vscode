@@ -41,28 +41,49 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
     }
 
     public async getData(query: string) {
-        const finalQuery = encodeURIComponent(query);
-        const baseUrl = "https://documentation.b2c.commercecloud.salesforce.com/DOC2/advanced";
-        const response = await fetch(
-            `${baseUrl}/searchView.jsp?searchWord=${finalQuery}&maxHits=500`
-        );
-        const text = await response.text();
-        const $ = cheerio.load(text);
-        const $results = $("table.results");
-        const $allLinks = $results.find("a");
+        try {
+            const finalQuery = encodeURIComponent(query);
+            const baseUrl = "https://documentation.b2c.commercecloud.salesforce.com/DOC2/advanced";
+            const response = await fetch(
+                `${baseUrl}/searchView.jsp?searchWord=${finalQuery}&maxHits=500`
+            );
 
-        $allLinks.removeAttr("onmouseover");
-        $allLinks.removeAttr("onmouseout");
+            if (!response.ok) {
+                this.sendResult("No results were found !");
+                return;
+            }
 
-        $results.find("td.icon").remove();
+            const text = await response.text();
+            const $ = cheerio.load(text);
+            const $results = $("table.results");
+            const $allLinks = $results.find("a");
 
-        const resultHtml = $results.html();
+            $allLinks.removeAttr("onmouseover");
+            $allLinks.removeAttr("onmouseout");
 
-        if (resultHtml) {
-            this.sendResult(resultHtml);
+            $results.find("td.icon").remove();
+
+            const resultHtml = $results.html();
+
+            if (resultHtml) {
+                this.sendResult(resultHtml);
+            } else {
+                this.sendResult("No results were found !");
+            }
+        } catch (e) {
+            this.sendResult("Error: " + e);
         }
+    }
 
-        return text;
+    public openWithQuery(query: string) {
+        vscode.commands.executeCommand("sfcc-docs-vscode.searchView.focus").then(() => {
+            setTimeout(() => {
+                this._view?.webview.postMessage({
+                    type: "replaceQuery",
+                    query: query,
+                });
+            }, 1000);
+        });
     }
 
     public sendResult(data: string) {

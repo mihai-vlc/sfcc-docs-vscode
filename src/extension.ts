@@ -5,7 +5,22 @@ import SearchViewProvider from "./SearchViewProvider";
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand("sfcc-docs-vscode.openDocs", () => {
-            DetailsViewPanel.createOrShow(context.extensionUri);
+            const editor = vscode.window.activeTextEditor;
+            if (!editor) {
+                return;
+            }
+
+            let cursorPosition = editor.selection.start;
+            let selectedText = editor.document.getText(editor.selection);
+
+            if (!selectedText) {
+                let wordRange = editor.document.getWordRangeAtPosition(cursorPosition);
+                selectedText = editor.document.getText(wordRange);
+            }
+
+            if (selectedText) {
+                searchProvider.openWithQuery(selectedText);
+            }
         })
     );
 

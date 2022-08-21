@@ -48,6 +48,17 @@
                 }
                 break;
             }
+
+            case "replaceQuery": {
+                queryInput.value = message.query;
+
+                vscode.setState({
+                    query: message.query,
+                });
+
+                performSearch(message.query);
+                break;
+            }
         }
     });
 

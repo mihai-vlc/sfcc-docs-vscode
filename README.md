@@ -2,14 +2,17 @@
 
 Browse the SFCC documentation directly from VSCode.
 
+![demo](/screenshoots/demo.gif)
+
 ## Features
 
 -   Search panel in the activity bar
 -   Details penel available as a sideview
+-   Search the current selection/word under the cursor
 
 ## Installation
 
-You can install it from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ionutvmi.sfcc-docs-vscode).
+You can install it from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ionutvmi.sfcc-docs-vscode).  
 `ext install sfcc-docs-vscode`
 
 ## Release Notes
