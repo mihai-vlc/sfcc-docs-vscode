@@ -15,6 +15,18 @@ Browse the SFCC documentation directly from VSCode.
 You can install it from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ionutvmi.sfcc-docs-vscode).  
 `ext install sfcc-docs-vscode`
 
+## Keyboard shortcuts
+
+To configure a custom keyboard shortcut for the search current word/selection:
+
+```
+    // keybindings.json
+    {
+        "key": "ctrl+shift+f10",
+        "command": "sfcc-docs-vscode.openDocs"
+    }
+```
+
 ## Release Notes
 
 The release notes are available in the [CHANGELOG.md](./CHANGELOG.md) document.
