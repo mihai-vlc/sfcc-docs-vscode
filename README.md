@@ -9,6 +9,7 @@ Browse the SFCC documentation directly from VSCode.
 -   Search panel in the activity bar
 -   Details penel available as a sideview
 -   Search the current selection/word under the cursor
+-   Previous/Next page navigation in the documentation details page
 
 ## Installation
 

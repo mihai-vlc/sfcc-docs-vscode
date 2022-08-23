@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.2.0] - 23/Aug/2022
+
+-   Improved the UI for the next/previous buttons
+-   Fixes the scrolling to elements by when referenced by id in the hash
+
 ## [1.1.0] - 23/Aug/2022
 
 -   Made the search box sticky in the sidebar
