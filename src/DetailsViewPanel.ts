@@ -143,22 +143,20 @@ export default class DetailsViewPanel {
             const lastIndex = this.prevHistory.length - 1;
             const link = this.makeRelative(baseUrl, this.prevHistory[lastIndex]);
             result += `<a 
-                class="js-history-item" 
+                class="js-history-item history-prev" 
                 data-direction="prev"
-                href="${link}">< previous</a>`;
+                href="${link}" 
+                title="previous page"></a>`;
         }
 
         if (this.nextHistory.length > 0) {
-            if (result !== "") {
-                result += " | ";
-            }
-
             const lastIndex = this.nextHistory.length - 1;
             const link = this.makeRelative(baseUrl, this.nextHistory[lastIndex]);
             result += `<a 
-                class="js-history-item" 
+                class="js-history-item history-next" 
                 data-direction="next"
-                href="${link}">next ></a>`;
+                href="${link}"
+                title="next page"></a>`;
         }
 
         return result;
