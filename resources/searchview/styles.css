@@ -26,6 +26,12 @@ form > * {
     margin-block-end: var(--input-margin-vertical);
 }
 
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
 *:focus {
     outline-color: var(--vscode-focusBorder) !important;
 }
@@ -114,6 +120,20 @@ body {
 
 .color-preview:hover {
     outline: inset white;
+}
+
+body .sticky-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 5px var(--container-paddding);
+    background-color: var(--vscode-sideBar-background);
+    margin: 0;
+}
+
+.results {
+    margin-top: 35px;
 }
 
 .results .description {

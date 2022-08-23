@@ -2,14 +2,13 @@
 
 (function () {
     const vscode = acquireVsCodeApi();
-    const pageUrlElement = document.querySelector(".js-page-url");
 
-    if (
-        pageUrlElement &&
-        pageUrlElement.textContent &&
-        pageUrlElement.textContent.indexOf("#") > -1
-    ) {
-        const selector = pageUrlElement.textContent.split("#")[1];
+    /** @type HTMLAnchorElement|null */
+    const pageUrlElement = document.querySelector(".js-page-url");
+    const currentPageURL = (pageUrlElement && pageUrlElement.href) || "";
+
+    if (currentPageURL && currentPageURL.indexOf("#") > -1) {
+        const selector = currentPageURL.split("#")[1];
         scrollToElement("#" + selector);
     } else {
         setTimeout(() => {
@@ -18,15 +17,24 @@
         }, 100);
     }
 
+    const scrollToTopEl = document.querySelector(".js-scroll-to-top");
+
+    if (scrollToTopEl) {
+        scrollToTopEl.addEventListener("click", () => {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        });
+    }
+
     // Handle messages sent from the extension to the webview
-    window.addEventListener("message", (event) => {
-        const message = event.data; // The json data that the extension sent
-        switch (message.type) {
-            case "searchResult": {
-                break;
-            }
-        }
-    });
+    // window.addEventListener("message", (event) => {
+    //     const message = event.data; // The json data that the extension sent
+    //     switch (message.type) {
+    //         case "searchResult": {
+    //             break;
+    //         }
+    //     }
+    // });
 
     document.addEventListener("click", function (event) {
         let element = /** @type HTMLElement */ (event.target);
@@ -60,6 +68,8 @@
         vscode.postMessage({
             type: "updateTopic",
             topic: href,
+            isHistoryNavigation: element.classList.contains("js-history-item"),
+            historyDirection: element.getAttribute("data-direction") || "",
         });
     });
 
@@ -76,11 +86,17 @@
     // @ts-ignore
     new VanillaContextMenu({
         scope: document.querySelector("body"),
+        customClass: "context-menu",
+        transitionDuration: 0,
         menuItems: [
             {
                 label: "Copy",
-                callback: () => {
-                    if (lastSelection) {
+                callback: function (event) {
+                    let element = event.target && event.target.closest("a");
+                    if (element) {
+                        const linkUrl = new URL(element.getAttribute("href") || "", currentPageURL);
+                        navigator.clipboard.writeText(linkUrl.href);
+                    } else if (lastSelection) {
                         navigator.clipboard.writeText(lastSelection);
                     }
                 },
@@ -98,7 +114,7 @@
     function getSelectionText() {
         var text = "";
         if (window.getSelection) {
-            text = window.getSelection().toString();
+            text = (window.getSelection() || "").toString();
         } else if (document.selection && document.selection.type != "Control") {
             text = document.selection.createRange().text;
         }

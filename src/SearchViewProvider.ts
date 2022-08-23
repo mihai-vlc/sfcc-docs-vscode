@@ -123,13 +123,15 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                 <title>SFCC Docs</title>
             </head>
             <body>
-                <div class="loader js-loader">
-                    <div class="loaderBar"></div>
+                <div class="sticky-banner">
+                    <div class="loader js-loader">
+                        <div class="loaderBar"></div>
+                    </div>
+                    <input 
+                        class="js-query-input" 
+                        type="text" 
+                        placeholder="Search" />
                 </div>
-                <input 
-                    class="js-query-input" 
-                    type="text" 
-                    placeholder="Search" />
 
                 <table class="js-search-result-wrapper results"></table>
 

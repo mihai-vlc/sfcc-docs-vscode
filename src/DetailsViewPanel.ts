@@ -18,6 +18,9 @@ export default class DetailsViewPanel {
     private readonly _extensionUri: vscode.Uri;
     private _disposables: vscode.Disposable[] = [];
     private currentBaseUrl: string = "";
+    private prevHistory: string[] = [];
+    private nextHistory: string[] = [];
+    private lastContentUrl: string = "";
 
     public static createOrShow(extensionUri: vscode.Uri, topic?: string) {
         // If we already have a panel, show it.
@@ -65,7 +68,12 @@ export default class DetailsViewPanel {
             (message) => {
                 switch (message.type) {
                     case "updateTopic":
-                        this.updateForTopic(message.topic, this.currentBaseUrl);
+                        this.handleHistory(message.isHistoryNavigation, message.historyDirection);
+                        this.updateForTopic(
+                            message.topic,
+                            this.currentBaseUrl,
+                            message.isHistoryNavigation
+                        );
                         break;
                 }
             },
@@ -74,27 +82,34 @@ export default class DetailsViewPanel {
         );
     }
 
-    public dispose() {
-        DetailsViewPanel.currentPanel = undefined;
+    private handleHistory(isHistoryNavigation: boolean, historyDirection: "prev" | "next") {
+        if (!isHistoryNavigation) {
+            return;
+        }
 
-        // Clean up our resources
-        this._panel.dispose();
-
-        while (this._disposables.length) {
-            const x = this._disposables.pop();
-            if (x) {
-                x.dispose();
-            }
+        if (historyDirection === "prev") {
+            this.prevHistory.pop()!;
+            this.nextHistory.push(this.lastContentUrl);
+        } else {
+            this.nextHistory.pop()!;
+            this.prevHistory.push(this.lastContentUrl);
         }
     }
 
-    public async updateForTopic(topic: string, baseUrl?: string) {
+    public async updateForTopic(topic: string, baseUrl?: string, isHistoryNavigation = false) {
+        if (!isHistoryNavigation && this.lastContentUrl) {
+            this.prevHistory.push(this.lastContentUrl);
+            this.nextHistory = [];
+        }
+
         baseUrl = baseUrl || "https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic";
         const contentUrl = normalizeUrl(`${baseUrl}/${topic}`);
 
         this.currentBaseUrl = contentUrl.substring(0, contentUrl.lastIndexOf("/"));
         const response = await fetch(contentUrl);
         const result = await response.text();
+
+        this.lastContentUrl = contentUrl;
 
         const $ = cheerio.load(result);
 
@@ -111,12 +126,65 @@ export default class DetailsViewPanel {
             $(el).attr("src", this.currentBaseUrl + "/" + src);
         });
 
-        $body.prepend(`<div class="page-url js-page-url">${contentUrl}</div>`);
+        $body.prepend(`<div class="page-url">
+            <div>${this.generateNavigationLinks(this.currentBaseUrl)}</div>
+            <a class="js-page-url" href="${contentUrl}">${contentUrl}</a>
+        </div>`);
 
         const content = $body.html() || "No content was found";
 
         this._panel.title = title;
         this._panel.webview.html = this._getHtmlForWebview(content);
+    }
+
+    private generateNavigationLinks(baseUrl: string) {
+        let result = "";
+        if (this.prevHistory.length > 0) {
+            const lastIndex = this.prevHistory.length - 1;
+            const link = this.makeRelative(baseUrl, this.prevHistory[lastIndex]);
+            result += `<a 
+                class="js-history-item" 
+                data-direction="prev"
+                href="${link}">< previous</a>`;
+        }
+
+        if (this.nextHistory.length > 0) {
+            if (result !== "") {
+                result += " | ";
+            }
+
+            const lastIndex = this.nextHistory.length - 1;
+            const link = this.makeRelative(baseUrl, this.nextHistory[lastIndex]);
+            result += `<a 
+                class="js-history-item" 
+                data-direction="next"
+                href="${link}">next ></a>`;
+        }
+
+        return result;
+    }
+
+    makeRelative(from: string, to: string) {
+        var fromParts = from.split("/");
+        var toParts = to.split("/");
+
+        var length = Math.min(fromParts.length, toParts.length);
+        var samePartsLength = length;
+        for (var i = 0; i < length; i++) {
+            if (fromParts[i] !== toParts[i]) {
+                samePartsLength = i;
+                break;
+            }
+        }
+
+        var outputParts = [];
+        for (var i = samePartsLength; i < fromParts.length; i++) {
+            outputParts.push("..");
+        }
+
+        outputParts = outputParts.concat(toParts.slice(samePartsLength));
+
+        return outputParts.join("/");
     }
 
     private _getHtmlForWebview(pageContent: string) {
@@ -151,17 +219,34 @@ export default class DetailsViewPanel {
                     Use a content security policy to only allow loading images from https or from our extension directory,
                     and only allow scripts that have a specific nonce.
                 -->
-                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; img-src *; script-src 'nonce-${nonce}';">
+                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; img-src * data:; script-src 'nonce-${nonce}';">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <link href="${stylesUri}" rel="stylesheet" />
                 <title>SFCC Details View</title>
             </head>
             <body>
                 ${pageContent}
+
+                <button class="scroll-to-top js-scroll-to-top">
+                    <span class="icon"></span>
+                </button>
                 <script nonce="${nonce}" src="${contextMenuJsUri}"></script>
                 <script nonce="${nonce}" src="${mainJsUri}"></script>
             </body>
             </html>`;
+    }
+    public dispose() {
+        DetailsViewPanel.currentPanel = undefined;
+
+        // Clean up our resources
+        this._panel.dispose();
+
+        while (this._disposables.length) {
+            const x = this._disposables.pop();
+            if (x) {
+                x.dispose();
+            }
+        }
     }
 }
 
