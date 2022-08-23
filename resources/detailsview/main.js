@@ -74,7 +74,8 @@
     });
 
     function scrollToElement(selector) {
-        const section = document.querySelector(`a[name=${selector.substring(1)}]`);
+        let section = document.querySelector(`a[name=${selector.substring(1)}]`);
+        section = section || document.querySelector(selector);
 
         if (section) {
             section.scrollIntoView();
@@ -115,7 +116,7 @@
         var text = "";
         if (window.getSelection) {
             text = (window.getSelection() || "").toString();
-        } else if (document.selection && document.selection.type != "Control") {
+        } else if (document.selection && document.selection.type !== "Control") {
             text = document.selection.createRange().text;
         }
         return text;

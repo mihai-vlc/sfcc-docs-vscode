@@ -113,8 +113,8 @@ export default class DetailsViewPanel {
 
         const $ = cheerio.load(result);
 
-        const title = $("h1").text() || "Result";
-        const $body = $("body")!;
+        const title = ($("h1").text() || $(".className").text() || "Result").trim();
+        const $body = $("body");
 
         $body.find("script").remove();
         $body.find("#cookieConsent").remove();
