@@ -41,18 +41,23 @@ export function activate(context: vscode.ExtensionContext) {
         })
     );
 
+    const DOC_BASE_URI = vscode.Uri.parse(
+        "https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/"
+    );
     context.subscriptions.push(
-        vscode.commands.registerCommand("sfcc-docs-vscode.treeItemCopyUrl", (node) =>
-            vscode.window.showInformationMessage(`Successfully called copy url on ${node.label}.`)
-        )
+        vscode.commands.registerCommand("sfcc-docs-vscode.treeItemCopyUrl", (node: DocItem) => {
+            const topicUri = vscode.Uri.parse(node.topic);
+            const fullUri = vscode.Uri.joinPath(DOC_BASE_URI, topicUri.path);
+            vscode.env.clipboard.writeText(fullUri.toString());
+        })
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand("sfcc-docs-vscode.treeItemOpenInBrowser", (node) =>
-            vscode.window.showInformationMessage(
-                `Successfully called open in browser ${node.label}.`
-            )
-        )
+        vscode.commands.registerCommand("sfcc-docs-vscode.treeItemOpenInBrowser", (node) => {
+            const topicUri = vscode.Uri.parse(node.topic);
+            const fullUri = vscode.Uri.joinPath(DOC_BASE_URI, topicUri.path);
+            vscode.env.openExternal(fullUri);
+        })
     );
 }
 

@@ -32,11 +32,11 @@
             },
             {
                 "command": "sfcc-docs-vscode.treeItemOpen",
-                "title": "Open item"
+                "title": "Open details"
             },
             {
                 "command": "sfcc-docs-vscode.treeItemCopyUrl",
-                "title": "Copy item url"
+                "title": "Copy url"
             },
             {
                 "command": "sfcc-docs-vscode.treeItemOpenInBrowser",
