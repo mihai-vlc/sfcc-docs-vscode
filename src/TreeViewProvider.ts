@@ -67,13 +67,26 @@ export class DocumentationTreeProvider implements vscode.TreeDataProvider<DocIte
             const topic = ($el.attr("href") || "").replace("../topic/", "/");
             const isLeaf = $el.attr("is_leaf") === "true";
 
-            let collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
+            const docItem = new DocItem(
+                title,
+                recordId,
+                topic,
+                vscode.TreeItemCollapsibleState.Collapsed
+            );
 
             if (isLeaf) {
-                collapsibleState = vscode.TreeItemCollapsibleState.None;
+                docItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
+
+                docItem.command = {
+                    command: "sfcc-docs-vscode.treeItemOpen",
+                    arguments: [docItem],
+                    title: "Open item",
+                };
+
+                docItem.contextValue = "sfccDocItemLeaf";
             }
 
-            result.push(new DocItem(title, recordId, topic, collapsibleState));
+            result.push(docItem);
         });
 
         return result;
@@ -82,11 +95,11 @@ export class DocumentationTreeProvider implements vscode.TreeDataProvider<DocIte
 
 export class DocItem extends vscode.TreeItem {
     constructor(
-        public readonly label: string,
-        public readonly recordId: string,
-        public readonly topic: string,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-        public readonly command?: vscode.Command
+        public label: string,
+        public recordId: string,
+        public topic: string,
+        public collapsibleState: vscode.TreeItemCollapsibleState,
+        public command?: vscode.Command
     ) {
         super(label, collapsibleState);
 

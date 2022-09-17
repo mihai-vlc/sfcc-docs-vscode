@@ -81,11 +81,11 @@
                 },
                 {
                     "command": "sfcc-docs-vscode.treeItemCopyUrl",
-                    "when": "view == sfcc-docs-vscode.docsTreeView && viewItem == sfccDocItem"
+                    "when": "view == sfcc-docs-vscode.docsTreeView"
                 },
                 {
                     "command": "sfcc-docs-vscode.treeItemOpenInBrowser",
-                    "when": "view == sfcc-docs-vscode.docsTreeView && viewItem == sfccDocItem"
+                    "when": "view == sfcc-docs-vscode.docsTreeView"
                 }
             ]
         }
