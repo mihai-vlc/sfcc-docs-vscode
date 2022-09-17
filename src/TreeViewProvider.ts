@@ -3,7 +3,7 @@ import fetch from "cross-fetch";
 import * as cheerio from "cheerio";
 
 const SFCC_DOC_BASE =
-    "https://documentation.b2c.commercecloud.salesforce.com/DOC1/advanced/tocfragment?toc=";
+    "https://documentation.b2c.commercecloud.salesforce.com/DOC2/advanced/tocfragment?toc=";
 
 const rootItem = "/com.demandware.dochelp/help.xml";
 
@@ -15,7 +15,11 @@ export class DocumentationTreeProvider implements vscode.TreeDataProvider<DocIte
     readonly onDidChangeTreeData: vscode.Event<DocItem | undefined | void> =
         this._onDidChangeTreeData.event;
 
-    constructor() {}
+    private topicToNodeMap: Map<string, DocItem> = new Map();
+
+    public getTreeItemByTopic(topic: string) {
+        return this.topicToNodeMap.get(topic);
+    }
 
     refresh(): void {
         this._onDidChangeTreeData.fire();
@@ -39,22 +43,26 @@ export class DocumentationTreeProvider implements vscode.TreeDataProvider<DocIte
         return fetch(SFCC_DOC_BASE + subItem)
             .then((response) => response.text())
             .then((text) => {
-                return this.processResponseText(text, element.recordId);
+                return this.processResponseText(text, element);
             });
     }
 
-    processResponseText(text: string, parentId?: string): DocItem[] {
+    getParent(element: DocItem): vscode.ProviderResult<DocItem> {
+        return element.parent;
+    }
+
+    private processResponseText(text: string, parent?: DocItem): DocItem[] {
         const result: DocItem[] = [];
         let selector = "node";
 
-        if (parentId) {
-            selector = `node[id=${parentId}] > node`;
+        if (parent) {
+            selector = `node[id=${parent.recordId}] > node`;
         }
 
         const $ = cheerio.load(text);
         const $nodes = $(selector);
 
-        $nodes.each(function (_, el) {
+        $nodes.each((_, el) => {
             const $el = $(el);
 
             const recordId = $el.attr("id") || "";
@@ -74,6 +82,8 @@ export class DocumentationTreeProvider implements vscode.TreeDataProvider<DocIte
                 vscode.TreeItemCollapsibleState.Collapsed
             );
 
+            docItem.parent = parent;
+
             if (isLeaf) {
                 docItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
 
@@ -86,6 +96,8 @@ export class DocumentationTreeProvider implements vscode.TreeDataProvider<DocIte
                 docItem.contextValue = "sfccDocItemLeaf";
             }
 
+            const topicUri = vscode.Uri.parse(docItem.topic);
+            this.topicToNodeMap.set(topicUri.path, docItem);
             result.push(docItem);
         });
 
@@ -94,17 +106,19 @@ export class DocumentationTreeProvider implements vscode.TreeDataProvider<DocIte
 }
 
 export class DocItem extends vscode.TreeItem {
+    public parent?: DocItem;
+    public command?: vscode.Command;
+    public contextValue = "sfccDocItem";
+
     constructor(
         public label: string,
         public recordId: string,
         public topic: string,
-        public collapsibleState: vscode.TreeItemCollapsibleState,
-        public command?: vscode.Command
+        public collapsibleState: vscode.TreeItemCollapsibleState
     ) {
         super(label, collapsibleState);
 
         this.tooltip = `${this.label}`;
         this.description = "";
     }
-    contextValue = "sfccDocItem";
 }

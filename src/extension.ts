@@ -31,10 +31,11 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.registerWebviewViewProvider(SearchViewProvider.viewId, searchProvider)
     );
 
-    const docTreeProvider = new DocumentationTreeProvider();
-    context.subscriptions.push(
-        vscode.window.registerTreeDataProvider(DocumentationTreeProvider.viewId, docTreeProvider)
-    );
+    const docDataProvider = new DocumentationTreeProvider();
+    const docTreeView = vscode.window.createTreeView(DocumentationTreeProvider.viewId, {
+        treeDataProvider: docDataProvider,
+    });
+
     context.subscriptions.push(
         vscode.commands.registerCommand("sfcc-docs-vscode.treeItemOpen", (node: DocItem) => {
             DetailsViewPanel.createOrShow(context.extensionUri, node.topic);
@@ -42,7 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     const DOC_BASE_URI = vscode.Uri.parse(
-        "https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/"
+        "https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/"
     );
     context.subscriptions.push(
         vscode.commands.registerCommand("sfcc-docs-vscode.treeItemCopyUrl", (node: DocItem) => {
@@ -53,11 +54,29 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand("sfcc-docs-vscode.treeItemOpenInBrowser", (node) => {
-            const topicUri = vscode.Uri.parse(node.topic);
-            const fullUri = vscode.Uri.joinPath(DOC_BASE_URI, topicUri.path);
-            vscode.env.openExternal(fullUri);
-        })
+        vscode.commands.registerCommand(
+            "sfcc-docs-vscode.treeItemOpenInBrowser",
+            (node: DocItem) => {
+                const topicUri = vscode.Uri.parse(node.topic);
+                const fullUri = vscode.Uri.joinPath(DOC_BASE_URI, topicUri.path);
+                vscode.env.openExternal(fullUri);
+            }
+        )
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            "sfcc-docs-vscode.treeItemRevealByTopic",
+            (topic: string) => {
+                const docItem = docDataProvider.getTreeItemByTopic(topic);
+
+                if (docItem) {
+                    return docTreeView.reveal(docItem, {
+                        expand: true,
+                    });
+                }
+            }
+        )
     );
 }
 

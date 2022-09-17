@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import fetch from "cross-fetch";
 import * as cheerio from "cheerio";
 import normalizeUrl from "normalize-url";
+import PromiseQueue from "./PromiseQueue";
 
 /**
  * Manages cat coding webview panels
@@ -21,6 +22,8 @@ export default class DetailsViewPanel {
     private prevHistory: string[] = [];
     private nextHistory: string[] = [];
     private lastContentUrl: string = "";
+
+    private actionsQueue: PromiseQueue;
 
     public static createOrShow(extensionUri: vscode.Uri, topic?: string) {
         // If we already have a panel, show it.
@@ -80,6 +83,8 @@ export default class DetailsViewPanel {
             null,
             this._disposables
         );
+
+        this.actionsQueue = new PromiseQueue();
     }
 
     private handleHistory(isHistoryNavigation: boolean, historyDirection: "prev" | "next") {
@@ -135,6 +140,27 @@ export default class DetailsViewPanel {
 
         this._panel.title = title;
         this._panel.webview.html = this._getHtmlForWebview(content);
+
+        const $breadcrumbs = $body.find(".help_breadcrumbs a");
+
+        if ($breadcrumbs.length > 1) {
+            $breadcrumbs.slice(1).each((_, el) => {
+                const currentTopic = $(el).attr("href");
+                const topicUrl = normalizeUrl(`${this.currentBaseUrl}/${currentTopic}`);
+                this.synchWithSidebar(topicUrl);
+            });
+        } else {
+            this.synchWithSidebar(contentUrl);
+        }
+    }
+
+    private synchWithSidebar(contentUrl: string) {
+        const topicUri = vscode.Uri.parse(contentUrl);
+        const topic = topicUri.path.replace("/DOC2/topic", "");
+
+        this.actionsQueue.add(() => {
+            return vscode.commands.executeCommand("sfcc-docs-vscode.treeItemRevealByTopic", topic);
+        });
     }
 
     private generateNavigationLinks(baseUrl: string) {
