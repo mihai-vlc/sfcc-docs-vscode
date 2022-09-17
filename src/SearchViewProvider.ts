@@ -4,7 +4,7 @@ import * as cheerio from "cheerio";
 import DetailsViewPanel from "./DetailsViewPanel";
 
 export default class SearchViewProvider implements vscode.WebviewViewProvider {
-    public static readonly viewType = "sfcc-docs-vscode.searchView";
+    public static readonly viewId = "sfcc-docs-vscode.searchView";
 
     private _view?: vscode.WebviewView;
 
