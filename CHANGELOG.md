@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.3.0] - 17/Sep/2022
+
+-   Implements the tree view for the documentation toc
+-   Implements the open in browser and copy to clipboard actions on the tree items
+-   Implements the item selection command
+-   Initial implementation of the sindebar synch functionality
+
 ## [1.2.0] - 23/Aug/2022
 
 -   Improved the UI for the next/previous buttons
