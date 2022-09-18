@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.4.0] - 17/Sep/2022
+## [1.4.1] - 18/Sep/2022
 
 -   Documented the search query command
 -   Implements the search selection in the details view, improves the synch with sidebar functionality
