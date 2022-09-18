@@ -10,6 +10,7 @@ Browse the SFCC documentation directly from VSCode.
 -   Details penel available as a sideview
 -   Search the current selection/word under the cursor
 -   Previous/Next page navigation in the documentation details page
+-   Panel for browsing the table of contents
 
 ## Installation
 

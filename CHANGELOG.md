@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.4.0] - 17/Sep/2022
+
+-   Documented the search query command
+-   Implements the search selection in the details view, improves the synch with sidebar functionality
+
 ## [1.3.0] - 17/Sep/2022
 
 -   Implements the tree view for the documentation toc
