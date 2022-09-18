@@ -79,7 +79,9 @@ export default class DetailsViewPanel {
                         );
                         break;
                     case "searchText":
-                        vscode.commands.executeCommand("sfcc-docs-vscode.search", message.query);
+                        vscode.commands.executeCommand("sfcc-docs-vscode.searchQuery", {
+                            query: message.query,
+                        });
                         break;
                 }
             },

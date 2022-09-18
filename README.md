@@ -25,6 +25,14 @@ To configure a custom keyboard shortcut for the search current word/selection:
     {
         "key": "ctrl+shift+f10",
         "command": "sfcc-docs-vscode.openDocs"
+    },
+    {
+        "key": "ctrl+shift+f11",
+        "command": "sfcc-docs-vscode.searchQuery",
+        // search a specific keyword
+        "args": {
+            "query": "ProductMgr"
+        }
     }
 ```
 

@@ -26,8 +26,10 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand("sfcc-docs-vscode.search", (query) => {
-            searchProvider.openWithQuery(query);
+        vscode.commands.registerCommand("sfcc-docs-vscode.searchQuery", (data) => {
+            if (data && data.query) {
+                searchProvider.openWithQuery(data.query);
+            }
         })
     );
 
