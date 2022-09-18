@@ -25,6 +25,12 @@ export function activate(context: vscode.ExtensionContext) {
         })
     );
 
+    context.subscriptions.push(
+        vscode.commands.registerCommand("sfcc-docs-vscode.search", (query) => {
+            searchProvider.openWithQuery(query);
+        })
+    );
+
     const searchProvider = new SearchViewProvider(context.extensionUri);
 
     context.subscriptions.push(
@@ -34,6 +40,14 @@ export function activate(context: vscode.ExtensionContext) {
     const docDataProvider = new DocumentationTreeProvider();
     const docTreeView = vscode.window.createTreeView(DocumentationTreeProvider.viewId, {
         treeDataProvider: docDataProvider,
+    });
+
+    docTreeView.onDidCollapseElement((event) => {
+        event.element.isExpaned = false;
+    });
+
+    docTreeView.onDidExpandElement((event) => {
+        event.element.isExpaned = true;
     });
 
     context.subscriptions.push(
@@ -67,10 +81,10 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand(
             "sfcc-docs-vscode.treeItemRevealByTopic",
-            (topic: string) => {
+            (topic: string, forceReveal: boolean) => {
                 const docItem = docDataProvider.getTreeItemByTopic(topic);
 
-                if (docItem) {
+                if (docItem && (forceReveal || !docItem.isExpaned)) {
                     return docTreeView.reveal(docItem, {
                         expand: true,
                     });

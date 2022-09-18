@@ -102,6 +102,17 @@
                     }
                 },
             },
+            {
+                label: "Search selection",
+                callback: function () {
+                    if (lastSelection) {
+                        vscode.postMessage({
+                            type: "searchText",
+                            query: lastSelection,
+                        });
+                    }
+                },
+            },
         ],
     });
 

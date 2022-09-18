@@ -78,6 +78,9 @@ export default class DetailsViewPanel {
                             message.isHistoryNavigation
                         );
                         break;
+                    case "searchText":
+                        vscode.commands.executeCommand("sfcc-docs-vscode.search", message.query);
+                        break;
                 }
             },
             null,
@@ -143,23 +146,27 @@ export default class DetailsViewPanel {
 
         const $breadcrumbs = $body.find(".help_breadcrumbs a");
 
+        // we need to first open the parent nodes before we can docus on the current page
         if ($breadcrumbs.length > 1) {
             $breadcrumbs.slice(1).each((_, el) => {
                 const currentTopic = $(el).attr("href");
                 const topicUrl = normalizeUrl(`${this.currentBaseUrl}/${currentTopic}`);
                 this.synchWithSidebar(topicUrl);
             });
-        } else {
-            this.synchWithSidebar(contentUrl);
         }
+        this.synchWithSidebar(contentUrl, true);
     }
 
-    private synchWithSidebar(contentUrl: string) {
+    private synchWithSidebar(contentUrl: string, forceReveal?: boolean) {
         const topicUri = vscode.Uri.parse(contentUrl);
         const topic = topicUri.path.replace("/DOC2/topic", "");
 
         this.actionsQueue.add(() => {
-            return vscode.commands.executeCommand("sfcc-docs-vscode.treeItemRevealByTopic", topic);
+            return vscode.commands.executeCommand(
+                "sfcc-docs-vscode.treeItemRevealByTopic",
+                topic,
+                forceReveal
+            );
         });
     }
 

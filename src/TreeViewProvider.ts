@@ -109,6 +109,7 @@ export class DocItem extends vscode.TreeItem {
     public parent?: DocItem;
     public command?: vscode.Command;
     public contextValue = "sfccDocItem";
+    public isExpaned = false;
 
     constructor(
         public label: string,
