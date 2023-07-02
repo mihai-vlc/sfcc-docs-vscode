@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.0.0] - 02/Jul/2023
+
+-   Implements the search using the index provided by the https://salesforcecommercecloud.github.io/b2c-dev-doc documentation
+-   Adds the search tips for the wildcard search, field search, fuzzy search, and term search
+-   Removes the tree view
+-   Adds links to the related documentation resources
+
 ## [1.4.1] - 18/Sep/2022
 
 -   Documented the search query command
