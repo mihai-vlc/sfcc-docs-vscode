@@ -63,6 +63,11 @@
             scrollToElement(href);
             return;
         }
+        if (href.endsWith(".json") || href.endsWith(".xsd")) {
+            const linkUrl = new URL(href || "", currentPageURL + "/");
+            element.setAttribute("href", linkUrl.toString());
+            return;
+        }
 
         event.preventDefault();
         vscode.postMessage({

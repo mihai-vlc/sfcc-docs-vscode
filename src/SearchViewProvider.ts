@@ -161,6 +161,25 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
 
                 <div class="js-search-result-wrapper results"></div>
 
+                Additional resources:
+                <ul>
+                    <li>
+                        <a href="https://help.salesforce.com/s/articleView?id=cc.b2c_getting_started.htm">
+                            Salesforce Help
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://developer.salesforce.com/docs/commerce/b2c-commerce/overview">
+                            Developer Center
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://help.salesforce.com/s/articleView?id=sf.rn_infocenter_retirement.htm&type=5">
+                            Release Notes
+                        </a>
+                    </li>
+                </ul>
+
                 <script nonce="${nonce}" src="${mainJsUri}"></script>
             </body>
             </html>`;
