@@ -74,9 +74,6 @@
         }
         let topic = clickedLink.getAttribute("href") || "";
 
-        topic = topic.replace("../topic/", "/");
-        topic = topic.replace(/\?resultof=.*/g, "");
-
         openDetailsView(topic);
     });
 

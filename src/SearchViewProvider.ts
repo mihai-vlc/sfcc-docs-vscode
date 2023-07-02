@@ -2,13 +2,21 @@ import fetch from "cross-fetch";
 import * as vscode from "vscode";
 import * as cheerio from "cheerio";
 import DetailsViewPanel from "./DetailsViewPanel";
+import IndexedSearch from "./IndexedSearch";
 
 export default class SearchViewProvider implements vscode.WebviewViewProvider {
     public static readonly viewId = "sfcc-docs-vscode.searchView";
 
     private _view?: vscode.WebviewView;
+    private indexedSearch: IndexedSearch;
 
-    constructor(private readonly _extensionUri: vscode.Uri) {}
+    constructor(
+        private readonly _extensionUri: vscode.Uri,
+        globalStorageUri: vscode.Uri,
+        globalState: vscode.Memento
+    ) {
+        this.indexedSearch = new IndexedSearch(globalStorageUri, globalState);
+    }
 
     public resolveWebviewView(
         webviewView: vscode.WebviewView,
@@ -42,34 +50,51 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
 
     public async getData(query: string) {
         try {
-            const finalQuery = encodeURIComponent(query);
-            const baseUrl = "https://documentation.b2c.commercecloud.salesforce.com/DOC2/advanced";
-            const response = await fetch(
-                `${baseUrl}/searchView.jsp?searchWord=${finalQuery}&maxHits=500`
-            );
+            let resultHtml = "";
+            var results = await this.indexedSearch.search(query);
 
-            if (!response.ok) {
-                this.sendResult("No results were found !");
-                return;
-            }
+            if (results.length > 0) {
+                var resultList = "<ol>";
 
-            const text = await response.text();
-            const $ = cheerio.load(text);
-            const $results = $("table.results");
-            const $allLinks = $results.find("a");
+                for (var i = 0; i < results.length; i++) {
+                    var result = results[i];
+                    var resultPage = this.indexedSearch.pageData[result.ref];
+                    var url = resultPage.url;
+                    var title = resultPage.title;
 
-            $allLinks.removeAttr("onmouseover");
-            $allLinks.removeAttr("onmouseout");
+                    var content = resultPage.content;
+                    var firstMatchIndex = content.toLowerCase().indexOf(query.toLowerCase());
 
-            $results.find("td.icon").remove();
+                    var start = Math.max(0, firstMatchIndex - 150);
+                    var end = Math.min(content.length, firstMatchIndex + query.length + 150);
+                    content = content.slice(start, end);
 
-            const resultHtml = $results.html();
+                    if (start > 0) {
+                        content = "..." + content;
+                    }
+                    if (end < resultPage.content.length) {
+                        content = content + "...";
+                    }
 
-            if (resultHtml) {
-                this.sendResult(resultHtml);
+                    var escapedSearchQuery = query.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+                    var re = new RegExp("(" + escapedSearchQuery + ")", "gi");
+                    content = content.replace(re, "<b>$&</b>");
+
+                    resultList += /*html*/ `
+                        <li>
+                            <a href='${url}' class="link">${title}</a>
+                            <div class="description">${content}</div>
+                        </li>
+                    `;
+                }
+
+                resultList += "</ol>";
+                resultHtml += resultList;
             } else {
-                this.sendResult("No results were found !");
+                resultHtml += "<p class='search-result'>No results found.</p>";
             }
+
+            this.sendResult(resultHtml);
         } catch (e) {
             this.sendResult("Error: " + e);
         }

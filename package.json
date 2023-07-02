@@ -29,18 +29,6 @@
             {
                 "command": "sfcc-docs-vscode.openDocs",
                 "title": "Open SFCC Docs"
-            },
-            {
-                "command": "sfcc-docs-vscode.treeItemOpen",
-                "title": "Open details"
-            },
-            {
-                "command": "sfcc-docs-vscode.treeItemCopyUrl",
-                "title": "Copy url"
-            },
-            {
-                "command": "sfcc-docs-vscode.treeItemOpenInBrowser",
-                "title": "Open in browser"
             }
         ],
         "views": {
@@ -49,11 +37,6 @@
                     "type": "webview",
                     "id": "sfcc-docs-vscode.searchView",
                     "name": "SFCC Docs"
-                },
-                {
-                    "type": "tree",
-                    "id": "sfcc-docs-vscode.docsTreeView",
-                    "name": "SFCC TOC"
                 }
             ]
         },
@@ -72,21 +55,6 @@
                     "command": "sfcc-docs-vscode.openDocs",
                     "group": "sfcc-docs-vscode"
                 }
-            ],
-            "view/item/context": [
-                {
-                    "command": "sfcc-docs-vscode.treeItemOpen",
-                    "when": "view == sfcc-docs-vscode.docsTreeView && viewItem == sfccDocItem",
-                    "group": "inline"
-                },
-                {
-                    "command": "sfcc-docs-vscode.treeItemCopyUrl",
-                    "when": "view == sfcc-docs-vscode.docsTreeView"
-                },
-                {
-                    "command": "sfcc-docs-vscode.treeItemOpenInBrowser",
-                    "when": "view == sfcc-docs-vscode.docsTreeView"
-                }
             ]
         }
     },
@@ -99,6 +67,7 @@
     },
     "devDependencies": {
         "@types/glob": "^7.2.0",
+        "@types/lunr": "^2.3.4",
         "@types/mocha": "^9.1.1",
         "@types/node": "16.x",
         "@types/vscode": "^1.70.0",
@@ -115,6 +84,7 @@
     "dependencies": {
         "cheerio": "^1.0.0-rc.12",
         "cross-fetch": "^3.1.5",
+        "lunr": "^2.3.9",
         "normalize-url": "^4.5.1"
     }
 }

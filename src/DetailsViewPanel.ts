@@ -112,7 +112,7 @@ export default class DetailsViewPanel {
             this.nextHistory = [];
         }
 
-        baseUrl = baseUrl || "https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic";
+        baseUrl = baseUrl || "https://salesforcecommercecloud.github.io";
         const contentUrl = normalizeUrl(`${baseUrl}/${topic}`);
 
         this.currentBaseUrl = contentUrl.substring(0, contentUrl.lastIndexOf("/"));
@@ -145,31 +145,6 @@ export default class DetailsViewPanel {
 
         this._panel.title = title;
         this._panel.webview.html = this._getHtmlForWebview(content);
-
-        const $breadcrumbs = $body.find(".help_breadcrumbs a");
-
-        // we need to first open the parent nodes before we can docus on the current page
-        if ($breadcrumbs.length > 1) {
-            $breadcrumbs.slice(1).each((_, el) => {
-                const currentTopic = $(el).attr("href");
-                const topicUrl = normalizeUrl(`${this.currentBaseUrl}/${currentTopic}`);
-                this.synchWithSidebar(topicUrl);
-            });
-        }
-        this.synchWithSidebar(contentUrl, true);
-    }
-
-    private synchWithSidebar(contentUrl: string, forceReveal?: boolean) {
-        const topicUri = vscode.Uri.parse(contentUrl);
-        const topic = topicUri.path.replace("/DOC2/topic", "");
-
-        this.actionsQueue.add(() => {
-            return vscode.commands.executeCommand(
-                "sfcc-docs-vscode.treeItemRevealByTopic",
-                topic,
-                forceReveal
-            );
-        });
     }
 
     private generateNavigationLinks(baseUrl: string) {
