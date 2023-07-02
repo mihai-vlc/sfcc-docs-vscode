@@ -165,12 +165,17 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                 <ul>
                     <li>
                         <a href="https://help.salesforce.com/s/articleView?id=cc.b2c_getting_started.htm">
-                            Salesforce Help
+                            Salesforce B2C Help
                         </a>
                     </li>
                     <li>
                         <a href="https://developer.salesforce.com/docs/commerce/b2c-commerce/overview">
                             Developer Center
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://salesforcecommercecloud.github.io/b2c-dev-doc">
+                            Developer Documentation
                         </a>
                     </li>
                     <li>
