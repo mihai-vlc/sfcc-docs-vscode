@@ -7,10 +7,9 @@ Browse the SFCC documentation directly from VSCode.
 ## Features
 
 -   Search panel in the activity bar
--   Details penel available as a sideview
+-   Details panel available as a sideview
 -   Search the current selection/word under the cursor
 -   Previous/Next page navigation in the documentation details page
--   Panel for browsing the table of contents
 
 ## Installation
 
@@ -47,7 +46,7 @@ The release notes are available in the [CHANGELOG.md](./CHANGELOG.md) document.
 
 Mihai Ionut Vilcu
 
--   [github/ionutvmi](https://github.com/ionutvmi)
+-   [github.com/mihai-vlc](https://github.com/mihai-vlc)
 -   [twitter/mihai_vlc](http://twitter.com/mihai_vlc)
 
 **Enjoy!**
