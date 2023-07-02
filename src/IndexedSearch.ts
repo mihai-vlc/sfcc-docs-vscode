@@ -46,6 +46,7 @@ export default class IndexedSearch {
 
             let data = await response.text();
             data = data.replace(/&nbsp;/g, " ");
+            data = data.replace(/Overview API Versioning Deprecated/g, " ");
 
             const content = new TextEncoder().encode(data);
             await vscode.workspace.fs.writeFile(indexFile, content);
