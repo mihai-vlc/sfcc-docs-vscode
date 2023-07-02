@@ -44,7 +44,9 @@ export default class IndexedSearch {
                 throw new Error("Failed to fetch the index file");
             }
 
-            const data = await response.text();
+            let data = await response.text();
+            data = data.replace(/&nbsp;/g, " ");
+
             const content = new TextEncoder().encode(data);
             await vscode.workspace.fs.writeFile(indexFile, content);
             console.log("SFCC Docs: Updating the search index file completed successfully !");

@@ -133,11 +133,16 @@ body .sticky-banner {
 }
 
 .results {
-    margin-top: 35px;
+    margin-top: 40px;
+}
+
+.results .link {
+    word-break: break-all;
 }
 
 .results .description {
     margin-bottom: 10px;
+    word-break: break-all;
 }
 
 .color-input {

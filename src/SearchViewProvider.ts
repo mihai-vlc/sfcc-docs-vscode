@@ -155,10 +155,11 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                     <input 
                         class="js-query-input" 
                         type="text" 
-                        placeholder="Search" />
+                        title="Wildcards: query*   s*Model \nFields: title:OrderMgr \nFuzzy:  odrer~1  oderr~2 \nTerm presence: +getContent -pipelet"
+                        placeholder="Search *query -pipelet +static fuzzy~3" />
                 </div>
 
-                <table class="js-search-result-wrapper results"></table>
+                <div class="js-search-result-wrapper results"></div>
 
                 <script nonce="${nonce}" src="${mainJsUri}"></script>
             </body>

@@ -95,6 +95,8 @@
             type: "newQuery",
             query: query,
         });
+
+        window.scroll(0, 0);
     }
 
     function openDetailsView(topic) {
