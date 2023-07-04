@@ -1,5 +1,10 @@
 # Change Log
 
+## [2.1.0] - 04/Jul/2023
+
+-   Adds the current/upcoming badge
+-   Adds the current/upcoming filtering of the results
+
 ## [2.0.0] - 02/Jul/2023
 
 -   Implements the search using the index provided by the https://salesforcecommercecloud.github.io/b2c-dev-doc documentation

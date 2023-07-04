@@ -77,6 +77,12 @@
         openDetailsView(topic);
     });
 
+    document.querySelectorAll(".js-filter").forEach((node) => {
+        node.addEventListener("change", () => {
+            performSearch(appState.query);
+        });
+    });
+
     var appState = /** @type AppState */ (vscode.getState()) || { query: "" };
 
     if (appState.query) {
@@ -89,6 +95,15 @@
     function performSearch(query) {
         if (loader) {
             loader.style.display = "block";
+        }
+
+        appState.query = query;
+
+        /** @type HTMLInputElement|null */
+        var badge = document.querySelector(".js-filter:checked");
+
+        if (badge) {
+            query += " -" + badge.value;
         }
 
         vscode.postMessage({

@@ -8,6 +8,7 @@ interface IndexRecord {
     title: string;
     url: string;
     content: string;
+    badge: string;
 }
 
 interface PageData {
@@ -60,11 +61,22 @@ export default class IndexedSearch {
         this.lunrIndex = lunr(function () {
             this.field("title", { boost: 10 });
             this.field("content");
+            this.field("badge");
             this.ref("url");
             this.metadataWhitelist = ["position"];
 
             data.forEach((page) => {
                 if (page.url && page.title && page.content) {
+                    page.badge = "";
+
+                    if (page.url.indexOf("/current/") > -1) {
+                        page.badge = "current";
+                    }
+
+                    if (page.url.indexOf("/upcoming/") > -1) {
+                        page.badge = "upcoming";
+                    }
+
                     this.add(page);
                     self.pageData[page.url] = page;
                 }

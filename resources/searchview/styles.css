@@ -80,7 +80,7 @@ button.secondary:hover {
     background: var(--vscode-button-secondaryHoverBackground);
 }
 
-input:not([type="checkbox"]),
+input[type="text"],
 textarea {
     display: block;
     width: 100%;
@@ -127,13 +127,13 @@ body .sticky-banner {
     top: 0;
     left: 0;
     width: 100%;
-    padding: 5px var(--container-paddding);
+    padding: 0 var(--container-paddding) 5px;
     background-color: var(--vscode-sideBar-background);
     margin: 0;
 }
 
 .results {
-    margin-top: 40px;
+    margin-top: 60px;
 }
 
 .results .link {
@@ -143,6 +143,22 @@ body .sticky-banner {
 .results .description {
     margin-bottom: 10px;
     word-break: break-all;
+}
+
+.badge {
+    border: 1px solid currentColor;
+    padding: 0 5px;
+    font-size: 0.7em;
+}
+
+input[type="radio"] {
+    margin: 0px;
+    padding: 0;
+    vertical-align: middle;
+}
+
+.filters {
+    margin-bottom: 5px;
 }
 
 .color-input {

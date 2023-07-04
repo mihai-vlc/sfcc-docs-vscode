@@ -51,22 +51,19 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
     public async getData(query: string) {
         try {
             let resultHtml = "";
-            var results = await this.indexedSearch.search(query);
+            let results = await this.indexedSearch.search(query);
 
             if (results.length > 0) {
-                var resultList = "<ol>";
+                resultHtml += "<ol>";
 
                 for (var i = 0; i < results.length; i++) {
                     var result = results[i];
-                    var resultPage = this.indexedSearch.pageData[result.ref];
-                    var url = resultPage.url;
-                    var title = resultPage.title;
+                    let resultPage = this.indexedSearch.pageData[result.ref];
+                    let { url, title, content, badge } = resultPage;
 
-                    var content = resultPage.content;
-                    var firstMatchIndex = content.toLowerCase().indexOf(query.toLowerCase());
-
-                    var start = Math.max(0, firstMatchIndex - 150);
-                    var end = Math.min(content.length, firstMatchIndex + query.length + 150);
+                    let firstMatchIndex = content.toLowerCase().indexOf(query.toLowerCase());
+                    let start = Math.max(0, firstMatchIndex - 150);
+                    let end = Math.min(content.length, firstMatchIndex + query.length + 150);
                     content = content.slice(start, end);
 
                     if (start > 0) {
@@ -76,20 +73,23 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                         content = content + "...";
                     }
 
-                    var escapedSearchQuery = query.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
-                    var re = new RegExp("(" + escapedSearchQuery + ")", "gi");
+                    let escapedSearchQuery = query.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+                    let re = new RegExp("(" + escapedSearchQuery + ")", "gi");
                     content = content.replace(re, "<b>$&</b>");
 
-                    resultList += /*html*/ `
+                    if (badge) {
+                        badge = `<span class="badge">${badge}</span>`;
+                    }
+
+                    resultHtml += /*html*/ `
                         <li>
-                            <a href='${url}' class="link">${title}</a>
+                            <a href='${url}' class="link">${title}</a> ${badge}
                             <div class="description">${content}</div>
                         </li>
                     `;
                 }
 
-                resultList += "</ol>";
-                resultHtml += resultList;
+                resultHtml += "</ol>";
             } else {
                 resultHtml += "<p class='search-result'>No results found.</p>";
             }
@@ -152,10 +152,20 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                     <div class="loader js-loader">
                         <div class="loaderBar"></div>
                     </div>
+                    <div class="filters">
+                        <label>
+                            <input type="radio" name="filterBy" value="upcoming" checked class="js-filter" />
+                            current
+                        </label>
+                        <label>
+                            <input type="radio" name="filterBy" value="current" class="js-filter" />
+                            upcoming
+                        </label>
+                    </div>
                     <input 
                         class="js-query-input" 
                         type="text" 
-                        title="Wildcards: query*   s*Model \nFields: title:OrderMgr \nFuzzy:  odrer~1  oderr~2 \nTerm presence: +getContent -pipelet"
+                        title="Wildcards: query*   s*Model \nFields: title:OrderMgr \nFuzzy:  odrer~1  oderr~2 \nTerm presence: +getContent -pipelet -upcoming"
                         placeholder="Search *query -pipelet +static fuzzy~3" />
                 </div>
 
