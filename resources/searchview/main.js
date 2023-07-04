@@ -103,7 +103,7 @@
         var badge = document.querySelector(".js-filter:checked");
 
         if (badge) {
-            query += " -" + badge.value;
+            query += " -badge:" + badge.value;
         }
 
         vscode.postMessage({
