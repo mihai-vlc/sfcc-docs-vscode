@@ -26,16 +26,6 @@
         });
     }
 
-    // Handle messages sent from the extension to the webview
-    // window.addEventListener("message", (event) => {
-    //     const message = event.data; // The json data that the extension sent
-    //     switch (message.type) {
-    //         case "searchResult": {
-    //             break;
-    //         }
-    //     }
-    // });
-
     document.addEventListener("click", function (event) {
         let element = /** @type HTMLElement */ (event.target);
 
@@ -55,7 +45,7 @@
             return;
         }
 
-        if (href.startsWith("https:")) {
+        if (href.startsWith("https:") || element.classList.contains("js-page-url")) {
             return;
         }
 
@@ -69,7 +59,10 @@
             return;
         }
 
+        // Prevent opening links in the browser
         event.preventDefault();
+        event.stopPropagation();
+
         vscode.postMessage({
             type: "updateTopic",
             topic: href,

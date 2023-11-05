@@ -7,7 +7,7 @@
 }
 
 body {
-    padding: 0 var(--container-paddding);
+    padding: var(--container-paddding);
     color: var(--vscode-foreground);
     font-size: var(--vscode-font-size);
     font-weight: var(--vscode-font-weight);
@@ -81,6 +81,7 @@ button.secondary:hover {
 }
 
 input[type="text"],
+input[type="search"],
 textarea {
     display: block;
     width: 100%;
@@ -130,25 +131,54 @@ body .sticky-banner {
     padding: 0 var(--container-paddding) 5px;
     background-color: var(--vscode-sideBar-background);
     margin: 0;
+    z-index: 10;
 }
 
 .results {
-    margin-top: 60px;
+    margin-top: var(--container-paddding);
+}
+
+.results ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.results li {
+    margin: 0;
+    margin-bottom: var(--container-paddding);
 }
 
 .results .link {
-    word-break: break-all;
+    word-break: break-word;
+}
+
+.results .link.deprecated {
+    position: relative;
+}
+
+.results .link.deprecated::before {
+    position: absolute;
+    left: -16px;
+    width: 20px;
+    height: 20px;
+    content: "⚠";
 }
 
 .results .description {
-    margin-bottom: 10px;
-    word-break: break-all;
+    word-break: break-word;
+}
+
+.results .snippet {
+    word-break: break-word;
 }
 
 .badge {
     border: 1px solid currentColor;
     padding: 0 5px;
     font-size: 0.7em;
+    margin-bottom: 8px;
+    display: inline-block;
 }
 
 input[type="radio"] {

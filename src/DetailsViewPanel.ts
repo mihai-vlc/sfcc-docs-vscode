@@ -4,6 +4,8 @@ import * as cheerio from "cheerio";
 import normalizeUrl from "normalize-url";
 import PromiseQueue from "./PromiseQueue";
 
+const DOCS_BASE: string = "http://localhost:3000";
+
 /**
  * Manages cat coding webview panels
  */
@@ -112,8 +114,8 @@ export default class DetailsViewPanel {
             this.nextHistory = [];
         }
 
-        baseUrl = baseUrl || "https://salesforcecommercecloud.github.io";
-        const contentUrl = normalizeUrl(`${baseUrl}/${topic}`);
+        const contentUrl = topic.startsWith(DOCS_BASE) ? normalizeUrl(topic) : normalizeUrl(`${DOCS_BASE}${topic}`);
+        const pageUrl = contentUrl.replace('?embed=true', '');
 
         this.currentBaseUrl = contentUrl.substring(0, contentUrl.lastIndexOf("/"));
         const response = await fetch(contentUrl);
@@ -123,22 +125,14 @@ export default class DetailsViewPanel {
 
         const $ = cheerio.load(result);
 
-        const title = ($("h1").text() || $(".className").text() || "Result").trim();
+        const title = ($("title").text() || "Result").trim();
         const $body = $("body");
 
         $body.find("script").remove();
-        $body.find("#cookieConsent").remove();
-        $body.find(".copyright_table td[align='right']").remove();
-
-        $body.find("img").each((_, el) => {
-            let src = $(el).attr("src");
-
-            $(el).attr("src", this.currentBaseUrl + "/" + src);
-        });
 
         $body.prepend(`<div class="page-url">
             <div>${this.generateNavigationLinks(this.currentBaseUrl)}</div>
-            <a class="js-page-url" href="${contentUrl}">${contentUrl}</a>
+            <a class="js-page-url" href="${pageUrl}">${pageUrl}</a>
         </div>`);
 
         const content = $body.html() || "No content was found";
@@ -148,28 +142,16 @@ export default class DetailsViewPanel {
     }
 
     private generateNavigationLinks(baseUrl: string) {
-        let result = "";
+        let nav = [];
         if (this.prevHistory.length > 0) {
-            const lastIndex = this.prevHistory.length - 1;
-            const link = this.makeRelative(baseUrl, this.prevHistory[lastIndex]);
-            result += `<a 
-                class="js-history-item history-prev" 
-                data-direction="prev"
-                href="${link}" 
-                title="previous page"></a>`;
+            nav.push(`<a class="js-history-item history-prev" data-direction="prev" href="${this.prevHistory[this.prevHistory.length - 1]}" title="previous page"></a>`);
         }
 
         if (this.nextHistory.length > 0) {
-            const lastIndex = this.nextHistory.length - 1;
-            const link = this.makeRelative(baseUrl, this.nextHistory[lastIndex]);
-            result += `<a 
-                class="js-history-item history-next" 
-                data-direction="next"
-                href="${link}"
-                title="next page"></a>`;
+            nav.push(`<a class="js-history-item history-next" data-direction="next" href="${this.nextHistory[this.nextHistory.length - 1]}" title="next page"></a>`);
         }
 
-        return result;
+        return nav.join("\n");
     }
 
     makeRelative(from: string, to: string) {
