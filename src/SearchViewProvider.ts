@@ -1,21 +1,19 @@
-import fetch from "cross-fetch";
 import * as vscode from "vscode";
-import * as cheerio from "cheerio";
 import DetailsViewPanel from "./DetailsViewPanel";
-import IndexedSearch from "./IndexedSearch";
+import SearchAPI from "./SearchAPI";
 
 export default class SearchViewProvider implements vscode.WebviewViewProvider {
     public static readonly viewId = "sfcc-docs-vscode.searchView";
 
     private _view?: vscode.WebviewView;
-    private indexedSearch: IndexedSearch;
+    private searchAPI: SearchAPI;
 
     constructor(
         private readonly _extensionUri: vscode.Uri,
         globalStorageUri: vscode.Uri,
         globalState: vscode.Memento
     ) {
-        this.indexedSearch = new IndexedSearch(globalStorageUri, globalState);
+        this.searchAPI = new SearchAPI();
     }
 
     public resolveWebviewView(
@@ -50,53 +48,32 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
 
     public async getData(query: string) {
         try {
-            let resultHtml = "";
-            let results = await this.indexedSearch.search(query);
+            let html = [];
+            let search = await this.searchAPI.search(query);
 
-            if (results.length > 0) {
-                resultHtml += "<ol>";
-
-                for (var i = 0; i < results.length; i++) {
-                    var result = results[i];
-                    let resultPage = this.indexedSearch.pageData[result.ref];
-                    let { url, title, content, badge } = resultPage;
-
-                    let firstMatchIndex = content.toLowerCase().indexOf(query.toLowerCase());
-                    let start = Math.max(0, firstMatchIndex - 150);
-                    let end = Math.min(content.length, firstMatchIndex + query.length + 150);
-                    content = content.slice(start, end);
-
-                    if (start > 0) {
-                        content = "..." + content;
+            if (search.results && search.results.length > 0) {
+                html.push("<ol>");
+                html.push(`<span class="badge">API v${search.version}</span>`);
+                search.results.forEach((result:any) => {
+                    html.push(`<li>`);
+                    html.push(`    <a href='${result.embed}' class="link ${result.deprecated ? 'deprecated' : ''}">${result.title}</a>`);
+                    html.push(`    <p class="description">${result.description}</p>`);
+                    
+                    if (result.snippet) {
+                        html.push(`    <p class="snippet">${result.snippet}</p>`);
                     }
-                    if (end < resultPage.content.length) {
-                        content = content + "...";
-                    }
-
-                    let escapedSearchQuery = query.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
-                    let re = new RegExp("(" + escapedSearchQuery + ")", "gi");
-                    content = content.replace(re, "<b>$&</b>");
-
-                    if (badge) {
-                        badge = `<span class="badge">${badge}</span>`;
-                    }
-
-                    resultHtml += /*html*/ `
-                        <li>
-                            <a href='${url}' class="link">${title}</a> ${badge}
-                            <div class="description">${content}</div>
-                        </li>
-                    `;
-                }
-
-                resultHtml += "</ol>";
+                    
+                    html.push(`</li>`);
+                });
+                
+                html.push("</ol>");
             } else {
-                resultHtml += "<p class='search-result'>No results found.</p>";
+                html.push("<p class='search-result'>No results found.</p>");
             }
 
-            this.sendResult(resultHtml);
+            this.sendResult(html.join("\n"));
         } catch (e) {
-            this.sendResult("Error: " + e);
+            this.sendResult(e);
         }
     }
 
@@ -152,27 +129,21 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                     <div class="loader js-loader">
                         <div class="loaderBar"></div>
                     </div>
-                    <div class="filters">
-                        <label>
-                            <input type="radio" name="filterBy" value="upcoming" checked class="js-filter" />
-                            current
-                        </label>
-                        <label>
-                            <input type="radio" name="filterBy" value="current" class="js-filter" />
-                            upcoming
-                        </label>
-                    </div>
                     <input 
                         class="js-query-input" 
-                        type="text" 
-                        title="Wildcards: query*   s*Model \nFields: title:OrderMgr \nFuzzy:  odrer~1  oderr~2 \nTerm presence: +getContent -pipelet -upcoming"
-                        placeholder="Search *query -pipelet +static fuzzy~3" />
+                        type="search" 
+                        placeholder="Search SFCC Docs" />
                 </div>
 
                 <div class="js-search-result-wrapper results"></div>
 
                 Additional resources:
                 <ul>
+                    <li>
+                        <a href="https://sfccdocs.com">
+                            SFCC Docs
+                        </a>
+                    </li>
                     <li>
                         <a href="https://help.salesforce.com/s/articleView?id=cc.b2c_getting_started.htm">
                             Salesforce B2C Help

@@ -74,6 +74,10 @@
         }
         let topic = clickedLink.getAttribute("href") || "";
 
+        // Prevent opening links in the browser
+        event.preventDefault();
+        event.stopPropagation();
+
         openDetailsView(topic);
     });
 
@@ -98,13 +102,6 @@
         }
 
         appState.query = query;
-
-        /** @type HTMLInputElement|null */
-        var badge = document.querySelector(".js-filter:checked");
-
-        if (badge) {
-            query += " -badge:" + badge.value;
-        }
 
         vscode.postMessage({
             type: "newQuery",
