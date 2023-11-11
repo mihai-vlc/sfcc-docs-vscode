@@ -1,6 +1,6 @@
 import fetch from "cross-fetch";
 
-const SEARCH_API = "http://localhost:3000/api/search?query="
+const SEARCH_API = "https://sfccdocs.com/api/search?query=";
 
 export default class SearchAPI {
     

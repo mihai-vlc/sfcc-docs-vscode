@@ -1,6 +1,4 @@
-import fetch from "cross-fetch";
 import * as vscode from "vscode";
-import * as cheerio from "cheerio";
 import DetailsViewPanel from "./DetailsViewPanel";
 import SearchAPI from "./SearchAPI";
 
@@ -58,7 +56,7 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                 html.push(`<span class="badge">API v${search.version}</span>`);
                 search.results.forEach((result:any) => {
                     html.push(`<li>`);
-                    html.push(`    <a href='${result.embed.replace('https://sfccdocs.com', 'http://localhost:3000')}' class="link ${result.deprecated ? 'deprecated' : ''}">${result.title}</a>`);
+                    html.push(`    <a href='${result.embed}' class="link ${result.deprecated ? 'deprecated' : ''}">${result.title}</a>`);
                     html.push(`    <p class="description">${result.description}</p>`);
                     
                     if (result.snippet) {
@@ -134,8 +132,7 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                     <input 
                         class="js-query-input" 
                         type="search" 
-                        title="Wildcards: query*   s*Model \nFields: title:OrderMgr \nFuzzy:  odrer~1  oderr~2 \nTerm presence: +getContent -pipelet -upcoming"
-                        placeholder="Search *query -pipelet +static fuzzy~3" />
+                        placeholder="Search SFCC Docs" />
                 </div>
 
                 <div class="js-search-result-wrapper results"></div>

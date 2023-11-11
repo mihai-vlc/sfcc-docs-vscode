@@ -4,7 +4,7 @@ import * as cheerio from "cheerio";
 import normalizeUrl from "normalize-url";
 import PromiseQueue from "./PromiseQueue";
 
-const DOCS_BASE: string = "http://localhost:3000";
+const DOCS_BASE: string = "https://sfccdocs.com";
 
 /**
  * Manages cat coding webview panels
