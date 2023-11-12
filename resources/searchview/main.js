@@ -62,8 +62,9 @@
         }
     });
 
-    resultWrapper.addEventListener("click", function (event) {
-        const clickedLink = /** @type HTMLElement */ (event.target);
+    resultWrapper.addEventListener("click", function (_event) {
+        const event = /** @type {MouseEvent} */ (_event);
+        const clickedLink = /** @type {HTMLElement} */ (event.target);
 
         if (!clickedLink) {
             return;
@@ -78,6 +79,9 @@
         event.preventDefault();
         event.stopPropagation();
 
+        if (event.ctrlKey) {
+            openDetailsView(topic, "newPanel");
+        }
         openDetailsView(topic);
     });
 
@@ -111,10 +115,11 @@
         window.scroll(0, 0);
     }
 
-    function openDetailsView(topic) {
+    function openDetailsView(topic, panelType = "") {
         vscode.postMessage({
             type: "openDetailsView",
             topic: topic,
+            panelType: panelType,
         });
     }
 

@@ -27,9 +27,9 @@ export default class DetailsViewPanel {
 
     private actionsQueue: PromiseQueue;
 
-    public static createOrShow(extensionUri: vscode.Uri, topic?: string) {
+    public static createOrShow(extensionUri: vscode.Uri, topic?: string, panelType?: string) {
         // If we already have a panel, show it.
-        if (DetailsViewPanel.currentPanel) {
+        if (DetailsViewPanel.currentPanel && panelType !== "newPanel") {
             if (!DetailsViewPanel.currentPanel._panel.visible) {
                 DetailsViewPanel.currentPanel._panel.reveal(vscode.ViewColumn.Beside);
             }

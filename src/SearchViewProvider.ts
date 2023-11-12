@@ -39,7 +39,7 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                     break;
                 }
                 case "openDetailsView": {
-                    DetailsViewPanel.createOrShow(this._extensionUri, data.topic);
+                    DetailsViewPanel.createOrShow(this._extensionUri, data.topic, data.panelType);
                     break;
                 }
             }
