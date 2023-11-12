@@ -114,9 +114,8 @@ export default class DetailsViewPanel {
             this.nextHistory = [];
         }
 
-        const contentUrl = topic.startsWith(DOCS_BASE)
-            ? normalizeUrl(topic)
-            : normalizeUrl(`${DOCS_BASE}${topic}`);
+        baseUrl = "https://sfccdocs.com";
+        const contentUrl = normalizeUrl(`${baseUrl}/${topic}`);
         const pageUrl = contentUrl.replace("?embed=true", "");
 
         this.currentBaseUrl = contentUrl.substring(0, contentUrl.lastIndexOf("/"));
@@ -132,8 +131,14 @@ export default class DetailsViewPanel {
 
         $body.find("script").remove();
 
+        $body.find("[id]").each(function (_, el) {
+            let id = $(el).attr("id");
+            id = id?.replace(/-/g, "");
+            $(el).attr("id", id);
+        });
+
         $body.prepend(`<div class="page-url">
-            <div>${this.generateNavigationLinks(this.currentBaseUrl)}</div>
+            <div>${this.generateNavigationLinks(DOCS_BASE)}</div>
             <a class="js-page-url" href="${pageUrl}">${pageUrl}</a>
         </div>`);
 
@@ -144,27 +149,39 @@ export default class DetailsViewPanel {
     }
 
     private generateNavigationLinks(baseUrl: string) {
-        let nav = [];
+        let nav = "";
         if (this.prevHistory.length > 0) {
-            nav.push(
-                `<a class="js-history-item history-prev" data-direction="prev" href="${
-                    this.prevHistory[this.prevHistory.length - 1]
-                }" title="previous page"></a>`
-            );
+            const lastIndex = this.prevHistory.length - 1;
+            const link = this.makeRelative(baseUrl, this.prevHistory[lastIndex]);
+            nav += `
+                <a 
+                    class="js-history-item history-prev" 
+                    data-direction="prev" 
+                    href="${link}" 
+                    title="previous page"
+                >
+                </a>
+            `;
         }
 
         if (this.nextHistory.length > 0) {
-            nav.push(
-                `<a class="js-history-item history-next" data-direction="next" href="${
-                    this.nextHistory[this.nextHistory.length - 1]
-                }" title="next page"></a>`
-            );
+            const lastIndex = this.nextHistory.length - 1;
+            const link = this.makeRelative(baseUrl, this.nextHistory[lastIndex]);
+            nav += `
+                <a 
+                    class="js-history-item history-next"
+                    data-direction="next"
+                    href="${link}" 
+                    title="next page"
+                >
+                </a>
+            `;
         }
 
-        return nav.join("\n");
+        return nav;
     }
 
-    makeRelative(from: string, to: string) {
+    private makeRelative(from: string, to: string) {
         var fromParts = from.split("/");
         var toParts = to.split("/");
 

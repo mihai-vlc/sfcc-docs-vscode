@@ -1,6 +1,7 @@
 import fetch from "cross-fetch";
 
-const SEARCH_API_URL = "https://sfccdocs.com/api/search";
+const BASE_URL = "https://sfccdocs.com";
+const SEARCH_API_URL = BASE_URL + "/api/search";
 
 interface SearchItem {
     content: string;
@@ -31,6 +32,13 @@ export default class SearchAPI {
             throw new Error(`Failed to fetch the search results for query: ${query}`);
         }
 
-        return response.json() as Promise<SearchResult>;
+        const searchResult = (await response.json()) as SearchResult;
+
+        searchResult.results = searchResult.results.map((r) => {
+            r.embed = r.embed.replace(BASE_URL, "");
+            return r;
+        });
+
+        return searchResult;
     }
 }
