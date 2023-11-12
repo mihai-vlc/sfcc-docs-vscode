@@ -4,7 +4,7 @@ import * as cheerio from "cheerio";
 import normalizeUrl from "normalize-url";
 import PromiseQueue from "./PromiseQueue";
 
-const DOCS_BASE: string = "https://sfccdocs.com";
+const DOCS_BASE = "https://sfccdocs.com";
 
 /**
  * Manages cat coding webview panels
@@ -114,8 +114,10 @@ export default class DetailsViewPanel {
             this.nextHistory = [];
         }
 
-        const contentUrl = topic.startsWith(DOCS_BASE) ? normalizeUrl(topic) : normalizeUrl(`${DOCS_BASE}${topic}`);
-        const pageUrl = contentUrl.replace('?embed=true', '');
+        const contentUrl = topic.startsWith(DOCS_BASE)
+            ? normalizeUrl(topic)
+            : normalizeUrl(`${DOCS_BASE}${topic}`);
+        const pageUrl = contentUrl.replace("?embed=true", "");
 
         this.currentBaseUrl = contentUrl.substring(0, contentUrl.lastIndexOf("/"));
         const response = await fetch(contentUrl);
@@ -144,11 +146,19 @@ export default class DetailsViewPanel {
     private generateNavigationLinks(baseUrl: string) {
         let nav = [];
         if (this.prevHistory.length > 0) {
-            nav.push(`<a class="js-history-item history-prev" data-direction="prev" href="${this.prevHistory[this.prevHistory.length - 1]}" title="previous page"></a>`);
+            nav.push(
+                `<a class="js-history-item history-prev" data-direction="prev" href="${
+                    this.prevHistory[this.prevHistory.length - 1]
+                }" title="previous page"></a>`
+            );
         }
 
         if (this.nextHistory.length > 0) {
-            nav.push(`<a class="js-history-item history-next" data-direction="next" href="${this.nextHistory[this.nextHistory.length - 1]}" title="next page"></a>`);
+            nav.push(
+                `<a class="js-history-item history-next" data-direction="next" href="${
+                    this.nextHistory[this.nextHistory.length - 1]
+                }" title="next page"></a>`
+            );
         }
 
         return nav.join("\n");
