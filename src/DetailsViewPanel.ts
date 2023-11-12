@@ -235,10 +235,15 @@ export default class DetailsViewPanel {
                 <link href="${stylesUri}" rel="stylesheet" />
                 <title>SFCC Details View</title>
             </head>
-            <body>
-                ${pageContent}
+            <body class="quick-menu-open">
+                <div class="main-content">
+                    ${pageContent}
+                </div>
 
-                <button class="scroll-to-top js-scroll-to-top">
+                <button class="quick-links-menu-button js-quick-links-menu-button" title="toggle quick links">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M4 18h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1zm0-5h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1zM3 7c0 .55.45 1 1 1h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1z" fill="currentColor"></path></svg>
+                </button>
+                <button class="scroll-to-top js-scroll-to-top" title="back to top">
                     <span class="icon"></span>
                 </button>
                 <script nonce="${nonce}" src="${contextMenuJsUri}"></script>

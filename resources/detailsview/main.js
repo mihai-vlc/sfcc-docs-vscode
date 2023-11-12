@@ -2,6 +2,9 @@
 
 (function () {
     const vscode = acquireVsCodeApi();
+    const state = vscode.getState();
+
+    buildQuickLinks(state);
 
     /** @type HTMLAnchorElement|null */
     const pageUrlElement = document.querySelector(".js-page-url");
@@ -131,4 +134,56 @@
             lastSelection = text;
         }
     });
+
+    function buildQuickLinks(state) {
+        if (state && state.quickLinksClosed) {
+            document.body.classList.remove("quick-menu-open");
+        }
+
+        let navContent = "";
+
+        /** @type {NodeListOf<HTMLElement>} */
+        const elements = document.querySelectorAll("h1[id], h2[id], h3[id]");
+
+        elements.forEach((el) => {
+            let prefix = "";
+            if (el.nodeName === "H3") {
+                prefix = "&nbsp;".repeat(6);
+            }
+            navContent += `
+            <li>
+                <a 
+                    href="#${el.id}"
+                    title="${el.innerText}" 
+                    data-section-id="${el.id}"
+                >
+                    ${prefix} ${el.innerText}
+                </a>
+            </li>
+            `;
+        });
+
+        const container = document.createElement("div");
+        container.classList.add("quick-links-menu");
+
+        container.innerHTML = `
+        <ul class="list-none">
+            ${navContent}
+        </ul>
+        `;
+
+        document.body.appendChild(container);
+
+        const menuButton = document.querySelector(".quick-links-menu-button");
+
+        if (menuButton) {
+            menuButton.addEventListener("click", function () {
+                document.body.classList.toggle("quick-menu-open");
+
+                vscode.setState({
+                    quickLinksClosed: !document.body.classList.contains("quick-menu-open"),
+                });
+            });
+        }
+    }
 })();
