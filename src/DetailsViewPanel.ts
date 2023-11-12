@@ -131,12 +131,6 @@ export default class DetailsViewPanel {
 
         $body.find("script").remove();
 
-        $body.find("[id]").each(function (_, el) {
-            let id = $(el).attr("id");
-            id = id?.replace(/-/g, "");
-            $(el).attr("id", id);
-        });
-
         $body.prepend(`<div class="page-url">
             <div>${this.generateNavigationLinks(DOCS_BASE)}</div>
             <a class="js-page-url" href="${pageUrl}">${pageUrl}</a>

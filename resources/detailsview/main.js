@@ -75,6 +75,17 @@
         let section = document.querySelector(`a[name=${selector.substring(1)}]`);
         section = section || document.querySelector(selector);
 
+        if (!section) {
+            const needle = selector.substr(1);
+            document.querySelectorAll("[id]").forEach((el) => {
+                let id = el.id;
+                id = id.replace(/-/g, "");
+                if (needle === id) {
+                    section = el;
+                }
+            });
+        }
+
         if (section) {
             section.scrollIntoView();
         }
