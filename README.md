@@ -3,6 +3,7 @@
 Browse the SFCC documentation directly from VSCode.
 
 ![demo](/screenshots/demo.gif)
+![demo](/screenshots/multi-panel.jpg)
 
 ## Features
 

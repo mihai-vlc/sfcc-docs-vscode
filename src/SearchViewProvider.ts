@@ -56,7 +56,11 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                     const deprecatedClass = result.deprecated ? "deprecated" : "";
                     return `
                     <li>
-                        <a href="${result.embed}" class="link ${deprecatedClass}">
+                        <a 
+                            href="${result.embed}"
+                            class="link ${deprecatedClass}"
+                            title="ctrl click for a new panel"
+                        >
                             ${result.title}
                         </a>
                         <div class="description">
