@@ -18,11 +18,11 @@
     "main": "./out/extension.js",
     "repository": {
         "type": "git",
-        "url": "https://github.com/ionutvmi/sfcc-docs-vscode"
+        "url": "https://github.com/mihai-vlc/sfcc-docs-vscode"
     },
     "bugs": {
-        "url": "https://github.com/ionutvmi/sfcc-docs-vscode/issues",
-        "email": "ionutvmi@gmail.com"
+        "url": "https://github.com/mihai-vlc/sfcc-docs-vscode/issues",
+        "email": "mihai.vlc11@gmail.com"
     },
     "contributes": {
         "commands": [
