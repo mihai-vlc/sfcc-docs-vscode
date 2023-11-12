@@ -4,7 +4,7 @@ import * as cheerio from "cheerio";
 import normalizeUrl from "normalize-url";
 import PromiseQueue from "./PromiseQueue";
 
-const DOCS_BASE: string = "https://sfccdocs.com";
+const DOCS_BASE = "https://sfccdocs.com";
 
 /**
  * Manages cat coding webview panels
@@ -114,8 +114,9 @@ export default class DetailsViewPanel {
             this.nextHistory = [];
         }
 
-        const contentUrl = topic.startsWith(DOCS_BASE) ? normalizeUrl(topic) : normalizeUrl(`${DOCS_BASE}${topic}`);
-        const pageUrl = contentUrl.replace('?embed=true', '');
+        baseUrl = "https://sfccdocs.com";
+        const contentUrl = normalizeUrl(`${baseUrl}/${topic}`);
+        const pageUrl = contentUrl.replace("?embed=true", "");
 
         this.currentBaseUrl = contentUrl.substring(0, contentUrl.lastIndexOf("/"));
         const response = await fetch(contentUrl);
@@ -131,7 +132,7 @@ export default class DetailsViewPanel {
         $body.find("script").remove();
 
         $body.prepend(`<div class="page-url">
-            <div>${this.generateNavigationLinks(this.currentBaseUrl)}</div>
+            <div>${this.generateNavigationLinks(DOCS_BASE)}</div>
             <a class="js-page-url" href="${pageUrl}">${pageUrl}</a>
         </div>`);
 
@@ -142,19 +143,39 @@ export default class DetailsViewPanel {
     }
 
     private generateNavigationLinks(baseUrl: string) {
-        let nav = [];
+        let nav = "";
         if (this.prevHistory.length > 0) {
-            nav.push(`<a class="js-history-item history-prev" data-direction="prev" href="${this.prevHistory[this.prevHistory.length - 1]}" title="previous page"></a>`);
+            const lastIndex = this.prevHistory.length - 1;
+            const link = this.makeRelative(baseUrl, this.prevHistory[lastIndex]);
+            nav += `
+                <a 
+                    class="js-history-item history-prev" 
+                    data-direction="prev" 
+                    href="${link}" 
+                    title="previous page"
+                >
+                </a>
+            `;
         }
 
         if (this.nextHistory.length > 0) {
-            nav.push(`<a class="js-history-item history-next" data-direction="next" href="${this.nextHistory[this.nextHistory.length - 1]}" title="next page"></a>`);
+            const lastIndex = this.nextHistory.length - 1;
+            const link = this.makeRelative(baseUrl, this.nextHistory[lastIndex]);
+            nav += `
+                <a 
+                    class="js-history-item history-next"
+                    data-direction="next"
+                    href="${link}" 
+                    title="next page"
+                >
+                </a>
+            `;
         }
 
-        return nav.join("\n");
+        return nav;
     }
 
-    makeRelative(from: string, to: string) {
+    private makeRelative(from: string, to: string) {
         var fromParts = from.split("/");
         var toParts = to.split("/");
 
@@ -214,10 +235,15 @@ export default class DetailsViewPanel {
                 <link href="${stylesUri}" rel="stylesheet" />
                 <title>SFCC Details View</title>
             </head>
-            <body>
-                ${pageContent}
+            <body class="quick-menu-open">
+                <div class="main-content">
+                    ${pageContent}
+                </div>
 
-                <button class="scroll-to-top js-scroll-to-top">
+                <button class="quick-links-menu-button js-quick-links-menu-button" title="toggle quick links">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M4 18h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1zm0-5h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1zM3 7c0 .55.45 1 1 1h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1z" fill="currentColor"></path></svg>
+                </button>
+                <button class="scroll-to-top js-scroll-to-top" title="back to top">
                     <span class="icon"></span>
                 </button>
                 <script nonce="${nonce}" src="${contextMenuJsUri}"></script>

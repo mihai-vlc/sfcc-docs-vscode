@@ -405,9 +405,63 @@ p.copyright_footer {
     font-weight: bold;
 }
 
+.list-none {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
 .page-url {
     word-break: break-all;
     padding: 10px 0;
+}
+
+.quick-links-menu-button {
+    position: fixed;
+    width: 25px;
+    height: 25px;
+    right: 10px;
+    bottom: 40px;
+    background-color: var(--vscode-button-background);
+    border-color: var(--vscode-button-border);
+    color: var(--vscode-button-foreground);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgb(0 0 0 / 25%);
+    outline: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.quick-links-menu-button svg {
+    fill: var(--vscode-button-foreground);
+}
+
+.quick-links-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 80px;
+    width: 25%;
+    overflow: scroll;
+    background-color: var(--vscode-editor-background);
+    display: none;
+    word-break: break-all;
+}
+.quick-links-menu li {
+    margin-bottom: 5px;
+}
+.quick-links-menu li a.active {
+    color: var(--vscode-button-foreground);
+}
+
+.quick-menu-open .main-content {
+    width: 75%;
+}
+.quick-menu-open .quick-links-menu {
+    display: block;
 }
 
 .scroll-to-top {

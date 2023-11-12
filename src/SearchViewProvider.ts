@@ -48,33 +48,66 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
 
     public async getData(query: string) {
         try {
-            let html = [];
+            let html = "";
             let search = await this.searchAPI.search(query);
 
             if (search.results && search.results.length > 0) {
-                html.push("<ol>");
-                html.push(`<span class="badge">API v${search.version}</span>`);
-                search.results.forEach((result:any) => {
-                    html.push(`<li>`);
-                    html.push(`    <a href='${result.embed}' class="link ${result.deprecated ? 'deprecated' : ''}">${result.title}</a>`);
-                    html.push(`    <p class="description">${result.description}</p>`);
-                    
-                    if (result.snippet) {
-                        html.push(`    <p class="snippet">${result.snippet}</p>`);
-                    }
-                    
-                    html.push(`</li>`);
+                let content = search.results.map((result) => {
+                    const deprecatedClass = result.deprecated ? "deprecated" : "";
+                    return `
+                    <li>
+                        <a href="${result.embed}" class="link ${deprecatedClass}">
+                            ${result.title}
+                        </a>
+                        <div class="description">
+                            <div>${this.formatDescription(result.content, query)}</div>
+                            <br />
+                            <em>${result.description}</em>
+                        </div>
+                    </li>
+                    `;
                 });
-                
-                html.push("</ol>");
+
+                html = `
+                <ol>
+                    <span class="badge">API v${search.version}</span>
+                    ${content.join("")}
+                </ol>
+                `;
             } else {
-                html.push("<p class='search-result'>No results found.</p>");
+                html = `<p class='search-result'>No results found.</p>`;
             }
 
-            this.sendResult(html.join("\n"));
+            this.sendResult(html);
         } catch (e) {
-            this.sendResult(e);
+            this.sendResult((e as Error).toString());
         }
+    }
+
+    private formatDescription(content: string, query: string): string {
+        content = content.replace(
+            /^\w* ?\w+\((\s*\w+\s*:\s*\w+,?(\.\.\.)?)*\)\s*:\s*\w+$/gim,
+            function (_match) {
+                return `<p>${_match}</p>`;
+            }
+        );
+
+        const words = query
+            .replace(/\s+/g, " ")
+            .replace(/([a-z])([A-Z])/g, "$1 $2")
+            .split(" ");
+
+        words.forEach((w) => {
+            content = content.replace(new RegExp(w, "ig"), function (match) {
+                return `<strong>${match}</strong>`;
+            });
+        });
+
+        content = content.replace(/ : (\w+)/gi, function (_match, p1: string) {
+            return ` : <u>${p1}</u>`;
+        });
+
+        return content;
     }
 
     public openWithQuery(query: string) {
@@ -160,8 +193,29 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                         </a>
                     </li>
                     <li>
+                        <a href="https://salesforcecommercecloud.github.io/b2c-dev-doc/docs/current/xsd/">
+                            XML XSD Schema
+                        </a>
+                    </li>
+                    </li>
+                    <li>
+                        <a href="https://salesforcecommercecloud.github.io/b2c-dev-doc/docs/current/content/">
+                            Page Designer JSON Schema
+                        </a>
+                    </li>
+                    <li>
                         <a href="https://help.salesforce.com/s/articleView?id=sf.rn_infocenter_retirement.htm&type=5">
                             Release Notes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/get-started-with-ocapi.html">
+                            OCAPI Reference
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://developer.salesforce.com/docs/commerce/commerce-api/references/about-commerce-api/about.html">
+                            SCAPI Reference
                         </a>
                     </li>
                 </ul>

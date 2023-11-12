@@ -138,23 +138,13 @@ body .sticky-banner {
     margin-top: var(--container-paddding);
 }
 
-.results ol {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.results li {
-    margin: 0;
-    margin-bottom: var(--container-paddding);
-}
-
 .results .link {
     word-break: break-word;
 }
 
 .results .link.deprecated {
     position: relative;
+    text-decoration: line-through;
 }
 
 .results .link.deprecated::before {
@@ -166,10 +156,7 @@ body .sticky-banner {
 }
 
 .results .description {
-    word-break: break-word;
-}
-
-.results .snippet {
+    margin: 0 0 var(--container-paddding) 0;
     word-break: break-word;
 }
 
