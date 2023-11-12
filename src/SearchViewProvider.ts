@@ -193,8 +193,29 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                         </a>
                     </li>
                     <li>
+                        <a href="https://salesforcecommercecloud.github.io/b2c-dev-doc/docs/current/xsd/">
+                            XML XSD Schema
+                        </a>
+                    </li>
+                    </li>
+                    <li>
+                        <a href="https://salesforcecommercecloud.github.io/b2c-dev-doc/docs/current/content/">
+                            Page Designer JSON Schema
+                        </a>
+                    </li>
+                    <li>
                         <a href="https://help.salesforce.com/s/articleView?id=sf.rn_infocenter_retirement.htm&type=5">
                             Release Notes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://developer.salesforce.com/docs/commerce/b2c-commerce/references/b2c-commerce-ocapi/get-started-with-ocapi.html">
+                            OCAPI Reference
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://developer.salesforce.com/docs/commerce/commerce-api/references/about-commerce-api/about.html">
+                            SCAPI Reference
                         </a>
                     </li>
                 </ul>
