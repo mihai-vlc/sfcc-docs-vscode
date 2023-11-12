@@ -39,8 +39,9 @@
         });
     }
 
-    document.addEventListener("click", function (event) {
-        let element = /** @type HTMLElement */ (event.target);
+    document.addEventListener("click", function (_event) {
+        const event = /** @type {MouseEvent} */ (_event);
+        let element = /** @type {HTMLElement} */ (event.target);
 
         if (element.tagName !== "A") {
             const closestLink = element.closest("a");
@@ -75,6 +76,14 @@
         // Prevent opening links in the browser
         event.preventDefault();
         event.stopPropagation();
+
+        if (event.ctrlKey) {
+            vscode.postMessage({
+                type: "openDetailsView",
+                topic: href,
+            });
+            return;
+        }
 
         vscode.postMessage({
             type: "updateTopic",

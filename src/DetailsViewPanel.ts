@@ -72,7 +72,15 @@ export default class DetailsViewPanel {
         this._panel.webview.onDidReceiveMessage(
             (message) => {
                 switch (message.type) {
-                    case "updateTopic":
+                    case "openDetailsView": {
+                        DetailsViewPanel.createOrShow(
+                            this._extensionUri,
+                            message.topic,
+                            "newPanel"
+                        );
+                        break;
+                    }
+                    case "updateTopic": {
                         this.handleHistory(message.isHistoryNavigation, message.historyDirection);
                         this.updateForTopic(
                             message.topic,
@@ -80,11 +88,13 @@ export default class DetailsViewPanel {
                             message.isHistoryNavigation
                         );
                         break;
-                    case "searchText":
+                    }
+                    case "searchText": {
                         vscode.commands.executeCommand("sfcc-docs-vscode.searchQuery", {
                             query: message.query,
                         });
                         break;
+                    }
                 }
             },
             null,

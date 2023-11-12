@@ -1,5 +1,12 @@
 # Change Log
 
+## [3.0.0] - 12/Nov/2023
+
+-   Replaces the indexed search with the sfccdocs.com API
+-   Improves the UI for the search view
+-   Adds the quick links menu in the sidebar of the details view
+-   Adds support for opening multiple panels by <key>ctrl</key> + click on links
+
 ## [2.1.0] - 04/Jul/2023
 
 -   Adds the current/upcoming badge
