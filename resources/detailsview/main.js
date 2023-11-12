@@ -1,10 +1,20 @@
 //@ts-check
 
-(function () {
-    const vscode = acquireVsCodeApi();
-    const state = vscode.getState();
+/**
+ * @typedef {Object} AppState
+ * @property {boolean} quickLinksClosed
+ */
 
-    buildQuickLinks(state);
+(function () {
+    /** @type {import('vscode-webview').WebviewApi<AppState>} */
+    const vscode = acquireVsCodeApi();
+
+    /** @type {AppState} */
+    const state = vscode.getState() || {
+        quickLinksClosed: false,
+    };
+
+    buildQuickLinks();
 
     /** @type HTMLAnchorElement|null */
     const pageUrlElement = document.querySelector(".js-page-url");
@@ -135,8 +145,8 @@
         }
     });
 
-    function buildQuickLinks(state) {
-        if (state && state.quickLinksClosed) {
+    function buildQuickLinks() {
+        if (state.quickLinksClosed) {
             document.body.classList.remove("quick-menu-open");
         }
 
@@ -153,10 +163,10 @@
             navContent += `
             <li>
                 <a 
-                    href="#${el.id}"
+                href="#${el.id}"
                     title="${el.innerText}" 
                     data-section-id="${el.id}"
-                >
+                    >
                     ${prefix} ${el.innerText}
                 </a>
             </li>
@@ -167,12 +177,51 @@
         container.classList.add("quick-links-menu");
 
         container.innerHTML = `
-        <ul class="list-none">
-            ${navContent}
-        </ul>
+            <ul class="list-none">
+                ${navContent}
+            </ul>
         `;
 
         document.body.appendChild(container);
+
+        let headerPositions = [];
+        calculateHeadersPosition();
+        window.addEventListener("resize", function () {
+            calculateHeadersPosition();
+        });
+
+        window.addEventListener("scroll", function () {
+            if (state.quickLinksClosed) {
+                return;
+            }
+
+            const currentScroll = window.scrollY + 100;
+            let lastId = "";
+            for (let i = 0; i < headerPositions.length; i++) {
+                if (headerPositions[i].top < currentScroll) {
+                    lastId = headerPositions[i].id;
+                }
+            }
+
+            /** @type {HTMLElement|null} */
+            const lastActive = document.querySelector(`.quick-links-menu a.active`);
+            if (lastActive) {
+                lastActive.classList.remove("active");
+            }
+
+            if (lastId) {
+                /** @type {HTMLElement|null} */
+                const menuItem = document.querySelector(
+                    `.quick-links-menu [data-section-id="${lastId}"]`
+                );
+                if (menuItem) {
+                    menuItem.classList.add("active");
+                    menuItem.scrollIntoView({
+                        block: "center",
+                    });
+                }
+            }
+        });
 
         const menuButton = document.querySelector(".quick-links-menu-button");
 
@@ -180,8 +229,20 @@
             menuButton.addEventListener("click", function () {
                 document.body.classList.toggle("quick-menu-open");
 
-                vscode.setState({
-                    quickLinksClosed: !document.body.classList.contains("quick-menu-open"),
+                state.quickLinksClosed = !document.body.classList.contains("quick-menu-open");
+                vscode.setState(state);
+            });
+        }
+
+        function calculateHeadersPosition() {
+            /** @type {NodeListOf<HTMLElement>} */
+            const elements = document.querySelectorAll("h1[id], h2[id], h3[id]");
+
+            headerPositions = [];
+            elements.forEach((el) => {
+                headerPositions.push({
+                    id: el.id,
+                    top: el.getBoundingClientRect().y + window.scrollY,
                 });
             });
         }

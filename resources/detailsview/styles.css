@@ -453,6 +453,9 @@ p.copyright_footer {
 .quick-links-menu li {
     margin-bottom: 5px;
 }
+.quick-links-menu li a.active {
+    color: var(--vscode-button-foreground);
+}
 
 .quick-menu-open .main-content {
     width: 75%;
