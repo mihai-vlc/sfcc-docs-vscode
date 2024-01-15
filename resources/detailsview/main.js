@@ -261,6 +261,7 @@
     }
 
     function initSearchPanel() {
+        /**@type HTMLInputElement|null */
         const searchInput = document.querySelector(".js-search-input");
 
         if (!searchInput) {
@@ -268,6 +269,14 @@
         }
 
         searchInput.addEventListener("input", debounce(handleSearch));
+        searchInput.addEventListener("focus", function () {
+            if (searchInput.value) {
+                vscode.postMessage({
+                    type: "searchQuery",
+                    query: searchInput.value,
+                });
+            }
+        });
 
         function handleSearch(event) {
             if (event.target.value) {
@@ -279,6 +288,28 @@
                 updateSearchResults("");
             }
         }
+
+        // @ts-ignore
+        hotkeys("ctrl+k,/", function (event, handler) {
+            switch (handler.key) {
+                case "/":
+                case "ctrl+k":
+                    event.preventDefault();
+                    event.stopPropagation();
+                    searchInput.focus();
+                    searchInput.select();
+                    break;
+            }
+        });
+
+        document.body.addEventListener("click", function (event) {
+            const clickedElement = /**@type HTMLInputElement|null */ (event && event.target);
+            if (clickedElement && clickedElement.closest(".js-search-panel")) {
+                return;
+            }
+
+            updateSearchResults("");
+        });
     }
 
     function updateSearchResults(content) {

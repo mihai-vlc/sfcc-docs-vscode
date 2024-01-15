@@ -312,11 +312,12 @@ export default class DetailsViewPanel {
                 <title>SFCC Details View</title>
             </head>
             <body class="quick-menu-open">
-                <div class="search-panel">
+                <div class="search-panel js-search-panel">
                     <input 
                         type="search"
                         placeholder="Search..."
                         value="${this.lastQuery}"
+                        title="focus with ctrl+k or /"
                         class="js-search-input search-input" />
                     <div class="js-search-panel-results search-panel-results"></div>
                 </div>

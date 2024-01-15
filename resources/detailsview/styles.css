@@ -429,8 +429,12 @@ p.copyright_footer {
 .search-panel-results {
     max-height: 70vh;
     overflow: auto;
-    padding: 10px;
+    padding: 5px;
     display: none;
+}
+
+.search-panel-results ol {
+    margin: 0;
 }
 
 .main-content {
@@ -470,6 +474,8 @@ p.copyright_footer {
     background-color: var(--vscode-editor-background);
     display: none;
     word-break: break-all;
+    padding-left: 5px;
+    box-sizing: border-box;
 }
 .quick-links-menu li {
     margin-bottom: 5px;
