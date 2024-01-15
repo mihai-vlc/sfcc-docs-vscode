@@ -1,5 +1,10 @@
 # Change Log
 
+## [3.2.0] - 16/Jan/2024
+
+-   Adds the search panel in the details view
+-   Adds support for using <key>Ctrl</key> + <key>K</key> or <key>/</key> to focus on the search panel
+
 ## [3.0.0] - 12/Nov/2023
 
 -   Replaces the indexed search with the sfccdocs.com API
