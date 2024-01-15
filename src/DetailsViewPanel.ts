@@ -3,6 +3,7 @@ import fetch from "cross-fetch";
 import * as cheerio from "cheerio";
 import normalizeUrl from "normalize-url";
 import PromiseQueue from "./PromiseQueue";
+import SearchAPI from "./SearchAPI";
 
 const DOCS_BASE = "https://sfccdocs.com";
 
@@ -26,6 +27,9 @@ export default class DetailsViewPanel {
     private lastContentUrl: string = "";
 
     private actionsQueue: PromiseQueue;
+
+    private searchAPI: SearchAPI;
+    private lastQuery: string;
 
     public static createOrShow(extensionUri: vscode.Uri, topic?: string, panelType?: string) {
         // If we already have a panel, show it.
@@ -64,6 +68,9 @@ export default class DetailsViewPanel {
         this._panel = panel;
         this._extensionUri = extensionUri;
 
+        this.searchAPI = new SearchAPI();
+        this.lastQuery = "";
+
         // Listen for when the panel is disposed
         // This happens when the user closes the panel or when the panel is closed programmatically
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
@@ -89,10 +96,14 @@ export default class DetailsViewPanel {
                         );
                         break;
                     }
-                    case "searchText": {
+                    case "searchInSidebarPanel": {
                         vscode.commands.executeCommand("sfcc-docs-vscode.searchQuery", {
                             query: message.query,
                         });
+                        break;
+                    }
+                    case "searchQuery": {
+                        this.performSearch(message.query);
                         break;
                     }
                 }
@@ -102,6 +113,51 @@ export default class DetailsViewPanel {
         );
 
         this.actionsQueue = new PromiseQueue();
+    }
+
+    public async performSearch(query: string) {
+        try {
+            let html = "";
+            let search = await this.searchAPI.search(query);
+
+            if (search.results && search.results.length > 0) {
+                this.lastQuery = query;
+
+                let content = search.results.map((result) => {
+                    const deprecatedClass = result.deprecated ? "deprecated" : "";
+                    return /*html*/ `
+                    <li>
+                        <a 
+                            href="${result.embed}"
+                            class="link ${deprecatedClass}"
+                            title="ctrl click for a new panel"
+                        >
+                            ${result.title}
+                        </a>
+                        <span>${result.content}</span>
+                    </li>
+                    `;
+                });
+
+                html = /*html*/ `
+                <ol>
+                    ${content.join("")}
+                </ol>
+                `;
+            } else {
+                html = /*html*/ `<div>No results found.</div>`;
+            }
+            this.sendResult(html);
+        } catch (e) {
+            this.sendResult((e as Error).toString());
+        }
+    }
+
+    public sendResult(data: string) {
+        this._panel.webview.postMessage({
+            type: "searchResult",
+            data: data,
+        });
     }
 
     private handleHistory(isHistoryNavigation: boolean, historyDirection: "prev" | "next") {
@@ -141,7 +197,7 @@ export default class DetailsViewPanel {
 
         $body.find("script").remove();
 
-        $body.prepend(`<div class="page-url">
+        $body.prepend(/*html*/ `<div class="page-url">
             <div>${this.generateNavigationLinks(DOCS_BASE)}</div>
             <a class="js-page-url" href="${pageUrl}">${pageUrl}</a>
         </div>`);
@@ -157,7 +213,7 @@ export default class DetailsViewPanel {
         if (this.prevHistory.length > 0) {
             const lastIndex = this.prevHistory.length - 1;
             const link = this.makeRelative(baseUrl, this.prevHistory[lastIndex]);
-            nav += `
+            nav += /*html*/ `
                 <a 
                     class="js-history-item history-prev" 
                     data-direction="prev" 
@@ -171,7 +227,7 @@ export default class DetailsViewPanel {
         if (this.nextHistory.length > 0) {
             const lastIndex = this.nextHistory.length - 1;
             const link = this.makeRelative(baseUrl, this.nextHistory[lastIndex]);
-            nav += `
+            nav += /*html*/ `
                 <a 
                     class="js-history-item history-next"
                     data-direction="next"
@@ -225,6 +281,16 @@ export default class DetailsViewPanel {
             )
         );
 
+        const hotkeysJsUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(
+                this._extensionUri,
+                "resources",
+                "detailsview",
+                "vendor",
+                "hotkeys.min.js"
+            )
+        );
+
         const stylesUri = webview.asWebviewUri(
             vscode.Uri.joinPath(this._extensionUri, "resources", "detailsview", "styles.css")
         );
@@ -246,6 +312,15 @@ export default class DetailsViewPanel {
                 <title>SFCC Details View</title>
             </head>
             <body class="quick-menu-open">
+                <div class="search-panel">
+                    <input 
+                        type="search"
+                        placeholder="Search..."
+                        value="${this.lastQuery}"
+                        class="js-search-input search-input" />
+                    <div class="js-search-panel-results search-panel-results"></div>
+                </div>
+
                 <div class="main-content">
                     ${pageContent}
                 </div>
@@ -257,6 +332,7 @@ export default class DetailsViewPanel {
                     <span class="icon"></span>
                 </button>
                 <script nonce="${nonce}" src="${contextMenuJsUri}"></script>
+                <script nonce="${nonce}" src="${hotkeysJsUri}"></script>
                 <script nonce="${nonce}" src="${mainJsUri}"></script>
             </body>
             </html>`;

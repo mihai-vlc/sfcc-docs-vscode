@@ -20,7 +20,6 @@ ul {
     padding-left: var(--container-paddding);
 }
 
-body > *,
 form > * {
     margin-block-start: var(--input-margin-vertical);
     margin-block-end: var(--input-margin-vertical);
@@ -416,6 +415,28 @@ p.copyright_footer {
     padding: 10px 0;
 }
 
+.search-panel {
+    position: fixed;
+    background-color: var(--vscode-editor-background);
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--vscode-dropdown-border);
+    box-shadow: 0 5px 5px var(--vscode-listFilterWidget-shadow);
+}
+
+.search-panel-results {
+    max-height: 70vh;
+    overflow: auto;
+    padding: 10px;
+    display: none;
+}
+
+.main-content {
+    padding-top: 40px;
+}
+
 .quick-links-menu-button {
     position: fixed;
     width: 25px;
@@ -457,6 +478,7 @@ p.copyright_footer {
     color: var(--vscode-button-foreground);
 }
 
+.quick-menu-open .search-panel,
 .quick-menu-open .main-content {
     width: 75%;
 }
@@ -498,6 +520,7 @@ p.copyright_footer {
 body .context-menu {
     background-color: var(--vscode-sideBar-background);
     box-shadow: 0 0 10px rgb(0 0 0 / 25%);
+    border: 1px solid var(--vscode-dropdown-border);
 }
 
 .history-prev,

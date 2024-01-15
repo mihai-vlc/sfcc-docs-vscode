@@ -54,7 +54,7 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
             if (search.results && search.results.length > 0) {
                 let content = search.results.map((result) => {
                     const deprecatedClass = result.deprecated ? "deprecated" : "";
-                    return `
+                    return /*html*/ `
                     <li>
                         <a 
                             href="${result.embed}"
@@ -72,14 +72,14 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                     `;
                 });
 
-                html = `
+                html = /*html*/ `
                 <ol>
                     <span class="badge">API v${search.version}</span>
                     ${content.join("")}
                 </ol>
                 `;
             } else {
-                html = `<p class='search-result'>No results found.</p>`;
+                html = /*html*/ `<p class='search-result'>No results found.</p>`;
             }
 
             this.sendResult(html);

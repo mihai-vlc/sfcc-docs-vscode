@@ -15,6 +15,9 @@
     };
 
     buildQuickLinks();
+    initSearchPanel();
+
+    listenWebviewMessages();
 
     /** @type HTMLAnchorElement|null */
     const pageUrlElement = document.querySelector(".js-page-url");
@@ -138,7 +141,7 @@
                 callback: function () {
                     if (lastSelection) {
                         vscode.postMessage({
-                            type: "searchText",
+                            type: "searchInSidebarPanel",
                             query: lastSelection,
                         });
                     }
@@ -255,5 +258,58 @@
                 });
             });
         }
+    }
+
+    function initSearchPanel() {
+        const searchInput = document.querySelector(".js-search-input");
+
+        if (!searchInput) {
+            return;
+        }
+
+        searchInput.addEventListener("input", debounce(handleSearch));
+
+        function handleSearch(event) {
+            if (event.target.value) {
+                vscode.postMessage({
+                    type: "searchQuery",
+                    query: event.target.value,
+                });
+            } else {
+                updateSearchResults("");
+            }
+        }
+    }
+
+    function updateSearchResults(content) {
+        /**@type HTMLDivElement|null */
+        const searchResultElement = document.querySelector(".js-search-panel-results");
+        if (!searchResultElement) {
+            return;
+        }
+        searchResultElement.innerHTML = content;
+        searchResultElement.style.display = content === "" ? "none" : "block";
+    }
+
+    function listenWebviewMessages() {
+        window.addEventListener("message", (event) => {
+            const message = event.data;
+            switch (message.type) {
+                case "searchResult": {
+                    updateSearchResults(message.data);
+                    break;
+                }
+            }
+        });
+    }
+
+    function debounce(func, timeout = 500) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                func.apply(this, args);
+            }, timeout);
+        };
     }
 })();
