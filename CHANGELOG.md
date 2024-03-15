@@ -1,5 +1,11 @@
 # Change Log
 
+## [3.4.0] - 15/Mar/2024
+
+-   Updates the dependencies
+-   Maintains the scroll position when switching tabs
+-   Fixes the click on inherited methods
+
 ## [3.2.0] - 16/Jan/2024
 
 -   Adds the search panel in the details view
