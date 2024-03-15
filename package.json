@@ -2,7 +2,7 @@
     "name": "sfcc-docs-vscode",
     "displayName": "SFCC Docs in VSCode",
     "description": "Browse the SFCC documentation from VSCode.",
-    "version": "3.2.0",
+    "version": "3.2.1",
     "publisher": "ionutvmi",
     "engines": {
         "vscode": "^1.84.0"
