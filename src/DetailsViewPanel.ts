@@ -53,6 +53,7 @@ export default class DetailsViewPanel {
                 // Enable javascript in the webview
                 enableScripts: true,
                 enableFindWidget: true,
+                retainContextWhenHidden: true,
                 localResourceRoots: [vscode.Uri.joinPath(extensionUri, "resources", "detailsview")],
             }
         );
@@ -201,6 +202,10 @@ export default class DetailsViewPanel {
             <div>${this.generateNavigationLinks(DOCS_BASE)}</div>
             <a class="js-page-url" href="${pageUrl}">${pageUrl}</a>
         </div>`);
+
+        $body.find('h3[id*="methods-inherited-from"]').each((_, el) => {
+            $(el).next("p").addClass("js-inherited-methods");
+        });
 
         const content = $body.html() || "No content was found";
 

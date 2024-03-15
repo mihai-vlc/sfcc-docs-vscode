@@ -56,7 +56,7 @@
             element = closestLink;
         }
 
-        const href = element.getAttribute("href");
+        let href = element.getAttribute("href");
 
         if (!href) {
             return;
@@ -79,6 +79,12 @@
         // Prevent opening links in the browser
         event.preventDefault();
         event.stopPropagation();
+
+        if (element.closest(".js-inherited-methods") && href.indexOf("#") === -1) {
+            href +=
+                "#" +
+                element.innerText.trim().replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+        }
 
         if (event.ctrlKey) {
             vscode.postMessage({
