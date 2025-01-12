@@ -107,6 +107,12 @@
 
         appState.query = query;
 
+        /** @type HTMLInputElement|null */
+        var badge = document.querySelector(".js-filter:checked");
+        if (badge) {
+            query += " -" + badge.value;
+        }
+
         vscode.postMessage({
             type: "newQuery",
             query: query,

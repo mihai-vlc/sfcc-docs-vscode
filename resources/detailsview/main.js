@@ -80,16 +80,10 @@
         event.preventDefault();
         event.stopPropagation();
 
-        if (element.closest(".js-inherited-methods") && href.indexOf("#") === -1) {
-            href +=
-                "#" +
-                element.innerText.trim().replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
-        }
-
         if (event.ctrlKey) {
             vscode.postMessage({
                 type: "openDetailsView",
-                topic: href,
+                topic: new URL(currentPageURL + "/..").pathname + href,
             });
             return;
         }
@@ -171,21 +165,30 @@
         let navContent = "";
 
         /** @type {NodeListOf<HTMLElement>} */
-        const elements = document.querySelectorAll("h1[id], h2[id], h3[id]");
+        const elements = document.querySelectorAll("a[name]");
+        const quickLinksElements = [];
 
         elements.forEach((el) => {
             let prefix = "";
-            if (el.nodeName === "H3") {
-                prefix = "&nbsp;".repeat(6);
+            let label = el.innerText;
+
+            let nextElement = /** @type {HTMLElement|null} */ (el.nextElementSibling);
+            if (!label && nextElement) {
+                if (nextElement.classList.contains("detailName")) {
+                    label = nextElement.innerText;
+                } else {
+                    return;
+                }
             }
+            quickLinksElements.push(el);
             navContent += `
             <li>
                 <a 
-                href="#${el.id}"
+                href="#${el.getAttribute("name")}"
                     title="${el.innerText}" 
-                    data-section-id="${el.id}"
+                    data-section-id="${el.getAttribute("name")}"
                     >
-                    ${prefix} ${el.innerText}
+                    ${prefix} ${label}
                 </a>
             </li>
             `;
@@ -203,9 +206,9 @@
         document.body.appendChild(container);
 
         let headerPositions = [];
-        calculateHeadersPosition();
+        calculateHeadersPosition(quickLinksElements);
         window.addEventListener("resize", function () {
-            calculateHeadersPosition();
+            calculateHeadersPosition(quickLinksElements);
         });
 
         window.addEventListener("scroll", function () {
@@ -241,7 +244,7 @@
             }
         });
 
-        const menuButton = document.querySelector(".quick-links-menu-button");
+        const menuButton = document.querySelector(".js-quick-links-menu-button");
 
         if (menuButton) {
             menuButton.addEventListener("click", function () {
@@ -252,14 +255,11 @@
             });
         }
 
-        function calculateHeadersPosition() {
-            /** @type {NodeListOf<HTMLElement>} */
-            const elements = document.querySelectorAll("h1[id], h2[id], h3[id]");
-
+        function calculateHeadersPosition(quickLinksElements) {
             headerPositions = [];
-            elements.forEach((el) => {
+            quickLinksElements.forEach((el) => {
                 headerPositions.push({
-                    id: el.id,
+                    id: el.getAttribute("name"),
                     top: el.getBoundingClientRect().y + window.scrollY,
                 });
             });

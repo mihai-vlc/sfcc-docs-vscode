@@ -13,7 +13,7 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
         globalStorageUri: vscode.Uri,
         globalState: vscode.Memento
     ) {
-        this.searchAPI = new SearchAPI();
+        this.searchAPI = new SearchAPI(globalStorageUri, globalState);
     }
 
     public resolveWebviewView(
@@ -39,7 +39,12 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                     break;
                 }
                 case "openDetailsView": {
-                    DetailsViewPanel.createOrShow(this._extensionUri, data.topic, data.panelType);
+                    DetailsViewPanel.createOrShow(
+                        this._extensionUri,
+                        data.topic,
+                        data.panelType,
+                        this.searchAPI
+                    );
                     break;
                 }
             }
@@ -54,19 +59,23 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
             if (search.results && search.results.length > 0) {
                 let content = search.results.map((result) => {
                     const deprecatedClass = result.deprecated ? "deprecated" : "";
+                    let badge = "";
+                    if (result.badge) {
+                        badge = `<span class="badge">${result.badge}</span>`;
+                    }
+
                     return /*html*/ `
                     <li>
                         <a 
-                            href="${result.embed}"
+                            href="${result.url}"
                             class="link ${deprecatedClass}"
                             title="ctrl click for a new panel"
                         >
                             ${result.title}
                         </a>
+                        ${badge}
                         <div class="description">
                             <div>${this.formatDescription(result.content, query)}</div>
-                            <br />
-                            <em>${result.description}</em>
                         </div>
                     </li>
                     `;
@@ -74,7 +83,7 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
 
                 html = /*html*/ `
                 <ol>
-                    <span class="badge">API v${search.version}</span>
+                    <!-- <span class="badge">API v${search.version}</span> -->
                     ${content.join("")}
                 </ol>
                 `;
@@ -89,6 +98,9 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
     }
 
     private formatDescription(content: string, query: string): string {
+        return content;
+
+        // TODO figure out if I still want to do any formatting here
         content = content.replace(
             /^\w* ?\w+\((\s*\w+\s*:\s*\w+,?(\.\.\.)?)*\)\s*:\s*\w+$/gim,
             function (_match) {
@@ -166,10 +178,21 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                     <div class="loader js-loader">
                         <div class="loaderBar"></div>
                     </div>
+                    <div class="filters">
+                        <label>
+                            <input type="radio" name="filterBy" value="upcoming" checked class="js-filter" />
+                            current
+                        </label>
+                        <label>
+                            <input type="radio" name="filterBy" value="current" class="js-filter" />
+                            upcoming
+                        </label>
+                    </div>
                     <input 
                         class="js-query-input" 
                         type="search" 
-                        placeholder="Search SFCC Docs" />
+                        title="Wildcards: query*   s*Model \nFields: title:OrderMgr \nFuzzy:  odrer~1  oderr~2 \nTerm presence: +getContent -pipelet -upcoming"
+                        placeholder="Search query* -pipelet +static fuzzy~3" />
                 </div>
 
                 <div class="js-search-result-wrapper results"></div>
@@ -177,7 +200,7 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                 Additional resources:
                 <ul>
                     <li>
-                        <a href="https://sfccdocs.com">
+                        <a href="https://salesforcecommercecloud.github.io/b2c-dev-doc/">
                             SFCC Docs
                         </a>
                     </li>

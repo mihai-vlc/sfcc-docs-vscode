@@ -5,7 +5,7 @@ import normalizeUrl from "normalize-url";
 import PromiseQueue from "./PromiseQueue";
 import SearchAPI from "./SearchAPI";
 
-const DOCS_BASE = "https://sfccdocs.com";
+const DOCS_BASE = "https://salesforcecommercecloud.github.io/";
 
 /**
  * Manages cat coding webview panels
@@ -31,7 +31,12 @@ export default class DetailsViewPanel {
     private searchAPI: SearchAPI;
     private lastQuery: string;
 
-    public static createOrShow(extensionUri: vscode.Uri, topic?: string, panelType?: string) {
+    public static createOrShow(
+        extensionUri: vscode.Uri,
+        topic: string,
+        panelType: string,
+        searchAPI: SearchAPI
+    ) {
         // If we already have a panel, show it.
         if (DetailsViewPanel.currentPanel && panelType !== "newPanel") {
             if (!DetailsViewPanel.currentPanel._panel.visible) {
@@ -58,18 +63,22 @@ export default class DetailsViewPanel {
             }
         );
 
-        DetailsViewPanel.currentPanel = new DetailsViewPanel(panel, extensionUri);
+        DetailsViewPanel.currentPanel = new DetailsViewPanel(panel, extensionUri, searchAPI);
 
         if (topic) {
             DetailsViewPanel.currentPanel.updateForTopic(topic).then(undefined, console.error);
         }
     }
 
-    private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+    private constructor(
+        panel: vscode.WebviewPanel,
+        extensionUri: vscode.Uri,
+        searchAPI: SearchAPI
+    ) {
         this._panel = panel;
         this._extensionUri = extensionUri;
 
-        this.searchAPI = new SearchAPI();
+        this.searchAPI = searchAPI;
         this.lastQuery = "";
 
         // Listen for when the panel is disposed
@@ -84,7 +93,8 @@ export default class DetailsViewPanel {
                         DetailsViewPanel.createOrShow(
                             this._extensionUri,
                             message.topic,
-                            "newPanel"
+                            "newPanel",
+                            this.searchAPI
                         );
                         break;
                     }
@@ -129,7 +139,7 @@ export default class DetailsViewPanel {
                     return /*html*/ `
                     <li>
                         <a 
-                            href="${result.embed}"
+                            href="${this.makeRelative(this.currentBaseUrl, result.url)}"
                             class="link ${deprecatedClass}"
                             title="ctrl click for a new panel"
                         >
@@ -181,9 +191,9 @@ export default class DetailsViewPanel {
             this.nextHistory = [];
         }
 
-        baseUrl = "https://sfccdocs.com";
+        baseUrl = baseUrl || DOCS_BASE;
         const contentUrl = normalizeUrl(`${baseUrl}/${topic}`);
-        const pageUrl = contentUrl.replace("?embed=true", "");
+        const pageUrl = contentUrl;
 
         this.currentBaseUrl = contentUrl.substring(0, contentUrl.lastIndexOf("/"));
         const response = await fetch(contentUrl);
@@ -197,15 +207,15 @@ export default class DetailsViewPanel {
         const $body = $("body");
 
         $body.find("script").remove();
+        $body.find("head").remove();
+        $body.find("header").remove();
+        $body.find("link").remove();
+        $body.find(`img[src="images/inherit.gif"]`).remove();
 
         $body.prepend(/*html*/ `<div class="page-url">
-            <div>${this.generateNavigationLinks(DOCS_BASE)}</div>
+            <div>${this.generateNavigationLinks()}</div>
             <a class="js-page-url" href="${pageUrl}">${pageUrl}</a>
         </div>`);
-
-        $body.find('h3[id*="methods-inherited-from"]').each((_, el) => {
-            $(el).next("p").addClass("js-inherited-methods");
-        });
 
         const content = $body.html() || "No content was found";
 
@@ -213,11 +223,11 @@ export default class DetailsViewPanel {
         this._panel.webview.html = this._getHtmlForWebview(content);
     }
 
-    private generateNavigationLinks(baseUrl: string) {
+    private generateNavigationLinks() {
         let nav = "";
         if (this.prevHistory.length > 0) {
             const lastIndex = this.prevHistory.length - 1;
-            const link = this.makeRelative(baseUrl, this.prevHistory[lastIndex]);
+            const link = this.makeRelative(this.currentBaseUrl, this.prevHistory[lastIndex]);
             nav += /*html*/ `
                 <a 
                     class="js-history-item history-prev" 
@@ -231,7 +241,7 @@ export default class DetailsViewPanel {
 
         if (this.nextHistory.length > 0) {
             const lastIndex = this.nextHistory.length - 1;
-            const link = this.makeRelative(baseUrl, this.nextHistory[lastIndex]);
+            const link = this.makeRelative(this.currentBaseUrl, this.nextHistory[lastIndex]);
             nav += /*html*/ `
                 <a 
                     class="js-history-item history-next"
@@ -327,7 +337,7 @@ export default class DetailsViewPanel {
                     <div class="js-search-panel-results search-panel-results"></div>
                 </div>
 
-                <div class="main-content">
+                <div class="page-main-content">
                     ${pageContent}
                 </div>
 

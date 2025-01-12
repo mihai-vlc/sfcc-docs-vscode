@@ -66,6 +66,7 @@
         "lint": "eslint src --ext ts"
     },
     "devDependencies": {
+        "@types/lunr": "2.3.7",
         "@types/node": "18.x",
         "@types/vscode": "1.87.0",
         "@types/vscode-webview": "1.57.5",
@@ -78,6 +79,7 @@
     "dependencies": {
         "cheerio": "1.0.0-rc.12",
         "cross-fetch": "4.0.0",
+        "lunr": "2.3.9",
         "normalize-url": "8.0.1"
     }
 }

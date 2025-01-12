@@ -437,7 +437,7 @@ p.copyright_footer {
     margin: 0;
 }
 
-.main-content {
+.page-main-content {
     padding-top: 40px;
 }
 
@@ -485,7 +485,7 @@ p.copyright_footer {
 }
 
 .quick-menu-open .search-panel,
-.quick-menu-open .main-content {
+.quick-menu-open .page-main-content {
     width: 75%;
 }
 .quick-menu-open .quick-links-menu {
