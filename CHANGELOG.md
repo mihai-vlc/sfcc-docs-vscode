@@ -1,5 +1,10 @@
 # Change Log
 
+## [3.5.0] - 12/Jan/2025
+
+-   Removes the sfccdocs.com API
+-   Optimizes the search index loading
+
 ## [3.4.0] - 15/Mar/2024
 
 -   Updates the dependencies
