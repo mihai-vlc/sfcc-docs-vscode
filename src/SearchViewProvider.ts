@@ -7,6 +7,8 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
 
     private _view?: vscode.WebviewView;
     private searchAPI: SearchAPI;
+    private lastQuery: string;
+    private isSearchInProgress: boolean;
 
     constructor(
         private readonly _extensionUri: vscode.Uri,
@@ -14,6 +16,8 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
         globalState: vscode.Memento
     ) {
         this.searchAPI = new SearchAPI(globalStorageUri, globalState);
+        this.lastQuery = '';
+        this.isSearchInProgress = false;
     }
 
     public resolveWebviewView(
@@ -32,10 +36,10 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
-        webviewView.webview.onDidReceiveMessage((data) => {
+        webviewView.webview.onDidReceiveMessage(async (data) => {
             switch (data.type) {
                 case "newQuery": {
-                    this.getData(data.query);
+                    await this.getData(data.query);
                     break;
                 }
                 case "openDetailsView": {
@@ -52,6 +56,13 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
     }
 
     public async getData(query: string) {
+        this.lastQuery = query;
+        if (this.isSearchInProgress) {
+            // the most recent query will be processed after the current search is completed
+            return;
+        }
+
+        this.isSearchInProgress = true;
         try {
             let html = "";
             let search = await this.searchAPI.search(query);
@@ -88,12 +99,19 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
                 </ol>
                 `;
             } else {
-                html = /*html*/ `<p class='search-result'>No results found.</p>`;
+                html = /*html*/ `<p class='search-result'>No results found for ${escapeHtml(query.replace(/ -(upcoming|current)/g, ""))}.</p>`;
             }
 
-            this.sendResult(html);
+            this.isSearchInProgress = false;
+            if (this.lastQuery == query) {
+                this.sendResult(html);
+            } else {
+                this.getData(this.lastQuery);
+            }
         } catch (e) {
             this.sendResult((e as Error).toString());
+        } finally {
+            this.isSearchInProgress = false;
         }
     }
 
@@ -251,6 +269,15 @@ export default class SearchViewProvider implements vscode.WebviewViewProvider {
             </body>
             </html>`;
     }
+}
+
+function escapeHtml(unsafe: string) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 function getNonce() {

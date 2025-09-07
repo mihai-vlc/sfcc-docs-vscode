@@ -2,7 +2,7 @@
     "name": "sfcc-docs-vscode",
     "displayName": "SFCC Docs in VSCode",
     "description": "Browse the SFCC documentation from VSCode.",
-    "version": "3.5.0",
+    "version": "3.6.0",
     "publisher": "ionutvmi",
     "engines": {
         "vscode": "^1.87.0"
@@ -36,6 +36,7 @@
                 {
                     "type": "webview",
                     "id": "sfcc-docs-vscode.searchView",
+                    "icon": "./resources/icon.png",
                     "name": "SFCC Docs"
                 }
             ]
@@ -67,19 +68,19 @@
     },
     "devDependencies": {
         "@types/lunr": "2.3.7",
-        "@types/node": "18.x",
-        "@types/vscode": "1.87.0",
+        "@types/node": "22.x",
+        "@types/vscode": "1.103.0",
         "@types/vscode-webview": "1.57.5",
-        "@typescript-eslint/eslint-plugin": "7.2.0",
-        "@typescript-eslint/parser": "7.2.0",
-        "esbuild": "0.20.2",
-        "eslint": "8.57.0",
-        "typescript": "5.4.2"
+        "@typescript-eslint/eslint-plugin": "8.42.0",
+        "@typescript-eslint/parser": "8.42.0",
+        "esbuild": "0.25.9",
+        "eslint": "9.35.0",
+        "typescript": "5.9.2"
     },
     "dependencies": {
-        "cheerio": "1.0.0-rc.12",
-        "cross-fetch": "4.0.0",
+        "cheerio": "1.1.2",
+        "cross-fetch": "4.1.0",
         "lunr": "2.3.9",
-        "normalize-url": "8.0.1"
+        "normalize-url": "8.0.2"
     }
 }

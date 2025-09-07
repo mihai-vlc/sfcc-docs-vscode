@@ -1,5 +1,11 @@
 # Change Log
 
+## [3.6.0] - 07/Sep/2025
+
+-   Updates the dependencies
+-   Fixes the handing of the search query during the index initialization
+
+
 ## [3.5.0] - 12/Jan/2025
 
 -   Removes the sfccdocs.com API
